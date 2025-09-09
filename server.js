@@ -28,7 +28,7 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/principal", require("./routes/principal"));
 app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
-app.use("/api/announcement", require("./routes/announcement"));
+app.use("/api/announcements", require("./routes/announcement"));
 
 // Base route
 app.get("/", (req, res) => {
