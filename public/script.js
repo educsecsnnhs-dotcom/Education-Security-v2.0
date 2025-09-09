@@ -66,12 +66,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
       try {
+        // Call backend logout (optional)
         await fetch("/api/auth/logout", { method: "POST" });
+
+        // ✅ Clear session storage
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+
+        // Redirect to login
+        window.location.href = "login.html";
       } catch (err) {
-        console.warn("Logout request failed:", err);
+        console.error("Logout failed:", err);
       }
-      clearUserSession();
-      window.location.href = "login.html";
+    });
+  }
+});
+
     });
   }
 });
