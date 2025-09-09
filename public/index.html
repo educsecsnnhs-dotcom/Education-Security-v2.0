@@ -2,10 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AGRITECH School Portal</title>
-  <meta http-equiv="refresh" content="0; url=login.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Management System</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <p>Redirecting to <a href="login.html">login</a>...</p>
+  <div class="center-box">
+    <h1>Welcome to AGRITECH School Portal</h1>
+    <p>Redirecting...</p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const user = getUserSession();
+      if (user) {
+        window.location.href = "welcome.html";
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
 </body>
 </html>
