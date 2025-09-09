@@ -1,10 +1,10 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 
@@ -19,7 +19,7 @@ app.use(morgan("dev"));
 const connectDB = require("./config/db");
 connectDB();
 
-// Routes
+// API Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/registrar", require("./routes/registrar"));
 app.use("/api/recordbook", require("./routes/recordbook"));
@@ -30,9 +30,11 @@ app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/announcements", require("./routes/announcement"));
 
-// Base route
+// Serve frontend from "public"
+app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/", (req, res) => {
-  res.send("School Management System API is running...");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
