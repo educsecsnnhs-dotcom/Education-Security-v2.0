@@ -72,3 +72,34 @@ main {
   flex: 1;
   overflow-y: auto;
 }
+
+/* Forms */
+.form-container {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin: 8px 0 4px;
+}
+
+form input {
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+form button {
+  padding: 10px;
+  background: #004080;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
