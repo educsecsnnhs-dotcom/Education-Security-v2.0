@@ -1,5 +1,5 @@
 // script.js
-// Shared helpers: Caesar cipher, session management, fetch wrapper, logout
+// Shared helpers: Caesar cipher + fetch wrapper
 
 // ==========================
 //  Caesar Cipher (Password)
@@ -9,11 +9,11 @@ function caesarEncrypt(text, shift = 7) {
     .split("")
     .map(char => {
       const code = char.charCodeAt(0);
-      // Uppercase letters A-Z
+      // Uppercase A–Z
       if (code >= 65 && code <= 90) {
         return String.fromCharCode(((code - 65 + shift) % 26) + 65);
       }
-      // Lowercase letters a-z
+      // Lowercase a–z
       if (code >= 97 && code <= 122) {
         return String.fromCharCode(((code - 97 + shift) % 26) + 97);
       }
@@ -27,25 +27,14 @@ function caesarEncrypt(text, shift = 7) {
 }
 
 // ==========================
-//  Session Handling
-// ==========================
-function saveUserSession(user) {
-  localStorage.setItem("currentUser", JSON.stringify(user));
-}
-
-function getUserSession() {
-  return JSON.parse(localStorage.getItem("currentUser"));
-}
-
-function clearUserSession() {
-  localStorage.removeItem("currentUser");
-}
-
-// ==========================
 //  Fetch Wrapper
 // ==========================
 async function apiFetch(url, options = {}) {
+  const token = Auth.getToken();
   const defaultHeaders = { "Content-Type": "application/json" };
+  if (token) {
+    defaultHeaders["Authorization"] = `Bearer ${token}`;
+  }
   options.headers = { ...defaultHeaders, ...(options.headers || {}) };
 
   try {
@@ -64,24 +53,11 @@ async function apiFetch(url, options = {}) {
 document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        // Call backend logout (optional)
-        await fetch("/api/auth/logout", { method: "POST" });
-
-        // ✅ Clear session storage
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-
-        // Redirect to login
-        window.location.href = "login.html";
-      } catch (err) {
-        console.error("Logout failed:", err);
-      }
+    logoutBtn.addEventListener("click", () => {
+      Auth.logout(); // ✅ now using auth.js
     });
   }
-});
 
-    });
-  }
+  // ✅ Ensure login required for welcome page
+  Auth.requireLogin();
 });
