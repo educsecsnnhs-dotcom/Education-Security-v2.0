@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Voting</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/script.js"></script>
+  <script defer src="../js/vote.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>🗳️ Student Voting</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <!-- Student Info -->
+    <section>
+      <h2>👤 My Info</h2>
+      <p>Name: <span id="studentName"></span></p>
+      <p>LRN: <span id="studentLRN"></span></p>
+      <p>Grade Level: <span id="studentGrade"></span></p>
+      <p>Section: <span id="studentSection"></span></p>
+    </section>
+
+    <!-- Voting Categories -->
+    <section id="votingSection">
+      <h2>🗳️ Elections</h2>
+
+      <div id="ssgElections">
+        <h3>School-wide SSG Elections</h3>
+        <form id="ssgForm"></form>
+      </div>
+
+      <div id="gradeElections">
+        <h3>Grade-level Representatives</h3>
+        <form id="gradeForm"></form>
+      </div>
+
+      <div id="sectionElections">
+        <h3>Section Representatives</h3>
+        <form id="sectionForm"></form>
+      </div>
+
+      <button id="submitVote">Submit Vote</button>
+    </section>
+  </main>
+</body>
+</html>
