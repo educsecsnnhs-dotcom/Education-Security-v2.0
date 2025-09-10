@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Archives</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/script.js"></script>
+  <script defer src="js/archives.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>📚 Student Archives</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>🔍 Search Archives</h2>
+      <label>
+        Name:
+        <input type="text" id="searchName" placeholder="Student name">
+      </label>
+      <label>
+        Batch:
+        <input type="number" id="searchBatch" placeholder="e.g. 2024">
+      </label>
+      <button id="applySearch">Search</button>
+    </section>
+
+    <section>
+      <h2>📋 Archived Students</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>LRN</th>
+            <th>Name</th>
+            <th>Grade/Strand</th>
+            <th>Section</th>
+            <th>Batch</th>
+          </tr>
+        </thead>
+        <tbody id="archiveTable"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
