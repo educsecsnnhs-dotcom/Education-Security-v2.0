@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enrolled Students</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/script.js"></script>
+  <script defer src="js/enrolled.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>📘 Enrolled Students</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>🔍 Filters</h2>
+      <label>
+        Grade Level:
+        <select id="filterGrade">
+          <option value="">All</option>
+          <option value="7">Grade 7</option>
+          <option value="8">Grade 8</option>
+          <option value="9">Grade 9</option>
+          <option value="10">Grade 10</option>
+          <option value="11">Grade 11</option>
+          <option value="12">Grade 12</option>
+        </select>
+      </label>
+
+      <label>
+        Strand/Section:
+        <input type="text" id="filterSection" placeholder="e.g. STEM A">
+      </label>
+
+      <button id="applyFilters">Apply</button>
+    </section>
+
+    <section>
+      <h2>📋 Student List</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>LRN</th>
+            <th>Name</th>
+            <th>Grade</th>
+            <th>Section</th>
+          </tr>
+        </thead>
+        <tbody id="enrolledTable"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
