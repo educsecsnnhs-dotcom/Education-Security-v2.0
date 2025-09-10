@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar - Enrollment Management</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/script.js"></script>
+  <script defer src="../js/registrar.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>Registrar Panel</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <!-- Stats Showcase -->
+    <section>
+      <h2>📊 Enrollment Stats</h2>
+      <p>Total Officially Enrolled: <span id="enrolledCount">0</span></p>
+      <p>Pending Applications: <span id="pendingCount">0</span></p>
+    </section>
+
+    <!-- Pending Enrollees -->
+    <section>
+      <h2>📝 Pending Enrollees</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>LRN</th>
+            <th>Level</th>
+            <th>Strand</th>
+            <th>School Year</th>
+            <th>Assign Section</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pendingTable"></tbody>
+      </table>
+    </section>
+
+    <!-- Section Management -->
+    <section>
+      <h2>⚙️ Section & Strand Management</h2>
+      <form id="sectionForm">
+        <label>Level:</label>
+        <select name="level" required>
+          <option value="junior">Junior High</option>
+          <option value="senior">Senior High</option>
+        </select>
+
+        <label>Strand:</label>
+        <input type="text" name="strand" placeholder="e.g., STEM, GAS, SPA" required>
+
+        <label>Section Name:</label>
+        <input type="text" name="section" placeholder="e.g., A, B, C" required>
+
+        <label>Student Limit:</label>
+        <input type="number" name="limit" value="40" min="1" required>
+
+        <button type="submit">Add / Update Section</button>
+      </form>
+
+      <h3>Existing Sections</h3>
+      <ul id="sectionList"></ul>
+    </section>
+  </main>
+</body>
+</html>
