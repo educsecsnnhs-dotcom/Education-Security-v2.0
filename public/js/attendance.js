@@ -20,16 +20,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const excusedEl = document.getElementById("excusedCount");
   const holidayEl = document.getElementById("holidayCount");
 
+  const markBtn = document.getElementById("markPresentBtn");
+
   // Load student info
   nameEl.textContent = user.name || "Unknown";
   lrnEl.textContent = user.lrn || "N/A";
   sectionEl.textContent = user.section || "Unassigned";
 
-  // Fetch attendance
+  // Load attendance history
   async function loadAttendance() {
     tableBody.innerHTML = "";
 
-    const records = await apiFetch(`/api/attendance/${user._id}`);
+    const records = await apiFetch(`/api/attendance/me`);
 
     let summary = {
       Present: 0,
@@ -61,6 +63,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     holidayEl.textContent = summary.Holiday;
   }
 
+  // Check if there is an open attendance session for this student’s section
+  async function checkOpenSession() {
+    try {
+      const openSession = await apiFetch(`/api/attendance/openSession/${user.sectionId}`);
+      if (openSession && openSession.isOpen) {
+        markBtn.style.display = "block";
+        markBtn.onclick = async () => {
+          await apiFetch("/api/attendance/mark", {
+            method: "POST",
+            body: JSON.stringify({ sessionId: openSession._id }),
+          });
+          alert("You are marked present ✅");
+          await loadAttendance();
+          markBtn.style.display = "none"; // hide after marking
+        };
+      } else {
+        markBtn.style.display = "none";
+      }
+    } catch (err) {
+      console.error("Error checking session:", err);
+      markBtn.style.display = "none";
+    }
+  }
+
   // Initialize
   await loadAttendance();
+  await checkOpenSession();
 });
