@@ -1,5 +1,6 @@
+// menu.js
 document.addEventListener("DOMContentLoaded", () => {
-  const user = getUserSession();
+  const user = Auth.getUser();
   const menuList = document.getElementById("menuList");
   if (!user || !user.role) return;
 
@@ -28,14 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
       { name: "Announcements", link: "announcements.html" },
     ],
     SuperAdmin: [
-      { name: "Full Access", link: "principal.html" },
+      { name: "Principal (Full Access)", link: "principal.html" },
     ],
     SSG: [
       { name: "SSG Management", link: "ssg.html" },
     ],
   };
 
-  // Always include base User menu
+  // Start with base User menu
   let finalMenu = [...menus.User];
 
   // Merge role menus
