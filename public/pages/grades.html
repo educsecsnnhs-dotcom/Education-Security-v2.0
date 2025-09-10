@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Grades</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/script.js"></script>
+  <script defer src="../js/grades.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>📘 My Grades</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <!-- Student info -->
+    <section>
+      <h2>👤 Student Info</h2>
+      <p>Name: <span id="studentName"></span></p>
+      <p>LRN: <span id="studentLRN"></span></p>
+      <p>Strand/Section: <span id="studentSection"></span></p>
+    </section>
+
+    <!-- Partial Grades -->
+    <section>
+      <h2>📝 Partial Grades</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Quarter 1</th>
+            <th>Quarter 2</th>
+            <th>Quarter 3</th>
+            <th>Quarter 4</th>
+          </tr>
+        </thead>
+        <tbody id="partialGrades"></tbody>
+      </table>
+    </section>
+
+    <!-- Official Grades -->
+    <section>
+      <h2>✅ Official Grades</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Final Grade</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody id="officialGrades"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
