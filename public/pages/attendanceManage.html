@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Attendance Manager</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/script.js"></script>
+  <script defer src="../js/attendanceManage.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>📋 Manage Attendance</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>🎓 Select Class</h2>
+      <select id="classSelect"></select>
+      <button id="openAttendance">Open Attendance</button>
+      <button id="closeAttendance">Close Attendance</button>
+    </section>
+
+    <section>
+      <h2>🧑‍🎓 Records</h2>
+      <table border="1">
+        <thead>
+          <tr><th>Student</th><th>Status</th></tr>
+        </thead>
+        <tbody id="attendanceRecords"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
