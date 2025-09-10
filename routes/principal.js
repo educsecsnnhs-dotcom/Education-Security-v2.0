@@ -16,7 +16,7 @@ router.get("/dashboard", authRequired, requireRole("SuperAdmin"), getDashboard);
 router.get("/enrollment-stats", authRequired, requireRole("SuperAdmin"), getEnrollmentStats);
 router.post("/set-limit", authRequired, requireRole("SuperAdmin"), setLimit);
 router.get("/departments", authRequired, requireRole("SuperAdmin"), getDepartmentsOverview);
-router.get("/grades", authRequired, requireRole("SuperAdmin"), getGlobalGrades);
+router.get("/global-grades", authRequired, requireRole("SuperAdmin"), getGlobalGrades);
 router.post("/assign-role", authRequired, requireRole("SuperAdmin"), assignHighRole);
 
 module.exports = router;
