@@ -9,17 +9,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const classSelect = document.getElementById("classSelect");
+  const sheetSelect = document.getElementById("sheetSelect");
+  const rangeInput = document.getElementById("rangeInput");
   const loadBtn = document.getElementById("loadRecordBook");
   const recordHead = document.getElementById("recordHead");
   const recordBody = document.getElementById("recordBody");
   const saveBtn = document.getElementById("saveGrades");
   const finalizeBtn = document.getElementById("finalizeGrades");
 
-  let currentRecordBook = null;
-  let currentRange = "Sheet1!A1:Z50"; // default visible range
-  let gradesMatrix = []; // local copy for edits
+  const presentBtn = document.getElementById("markPresent");
+  const absentBtn = document.getElementById("markAbsent");
+  const excusedBtn = document.getElementById("markExcused");
 
-  // Load teacher’s assigned classes
+  let currentRecordBook = null;
+  let currentSheet = "Sheet1";
+  let currentRange = "A1:Z50";
+  let gradesMatrix = []; // editable copy
+
+  // 🔹 Load teacher’s assigned classes
   async function loadClasses() {
     const classes = await apiFetch(`/api/classes/teacher/${user._id}`);
     classes.forEach(cls => {
@@ -30,7 +37,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Load record book from backend
+  // 🔹 Load available sheet tabs
+  async function loadSheets(sheetId) {
+    sheetSelect.innerHTML = "";
+    const sheets = await apiFetch(`/api/recordbook/sheets/${sheetId}`);
+    sheets.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s;
+      sheetSelect.appendChild(opt);
+    });
+  }
+
+  // 🔹 Load record book from backend
   async function loadRecordBook() {
     const classId = classSelect.value;
     if (!classId) return alert("Select a class first!");
@@ -47,16 +66,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentRecordBook = await apiFetch(`/api/recordbook/${cls.recordBookId}`);
     }
 
-    // Fetch spreadsheet data
+    await loadSheets(currentRecordBook.sheetId);
+
+    currentSheet = sheetSelect.value || "Sheet1";
+    currentRange = rangeInput.value || "A1:Z50";
+
     const data = await apiFetch(
-      `/api/recordbook/grades?recordBookId=${currentRecordBook._id}&range=${encodeURIComponent(currentRange)}`
+      `/api/recordbook/grades?recordBookId=${currentRecordBook._id}&range=${encodeURIComponent(currentSheet + "!" + currentRange)}`
     );
 
     gradesMatrix = data.grades || [];
     renderTable();
   }
 
-  // Render table into editable cells
+  // 🔹 Render table
   function renderTable() {
     recordHead.innerHTML = "";
     recordBody.innerHTML = "";
@@ -66,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Header row
+    // Header
     const headerRow = document.createElement("tr");
     gradesMatrix[0].forEach(cell => {
       const th = document.createElement("th");
@@ -75,15 +98,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     recordHead.appendChild(headerRow);
 
-    // Body rows
+    // Rows
     for (let i = 1; i < gradesMatrix.length; i++) {
       const tr = document.createElement("tr");
       gradesMatrix[i].forEach((cell, j) => {
         const td = document.createElement("td");
-        td.contentEditable = j > 0; // allow editing except first column (student name/LRN)
         td.textContent = cell || "";
         td.dataset.row = i;
         td.dataset.col = j;
+
+        // Freeze first column (student name / LRN)
+        if (j > 0) {
+          td.contentEditable = true;
+        } else {
+          td.style.backgroundColor = "#f0f0f0";
+        }
+
         tr.appendChild(td);
       });
       recordBody.appendChild(tr);
@@ -98,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Save updated grades
+  // 🔹 Save to Google Sheets
   async function saveGrades() {
     if (!currentRecordBook) return;
 
@@ -106,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       method: "POST",
       body: JSON.stringify({
         recordBookId: currentRecordBook._id,
-        range: currentRange,
+        range: currentSheet + "!" + currentRange,
         values: gradesMatrix,
       }),
     });
@@ -114,9 +144,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Grades saved to Google Sheets ✅");
   }
 
-  // Finalize grades
+  // 🔹 Finalize
   async function finalizeGrades() {
     if (!currentRecordBook) return;
+
+    const confirmFinalize = confirm("⚠️ Once finalized, grades cannot be edited. Continue?");
+    if (!confirmFinalize) return;
 
     await apiFetch(`/api/recordbook/finalize`, {
       method: "POST",
@@ -126,10 +159,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Grades finalized ✅");
   }
 
-  // Bind events
+  // 🔹 Mark attendance helper
+  async function markAttendance(status) {
+    if (!currentRecordBook) return;
+    const selected = Array.from(recordBody.querySelectorAll("tr td:first-child"));
+    const studentNames = selected.map(td => td.textContent);
+
+    // Example: mark entire range as "Present"
+    const values = studentNames.map(name => [name, status]);
+
+    await apiFetch(`/api/recordbook/attendance`, {
+      method: "POST",
+      body: JSON.stringify({
+        recordBookId: currentRecordBook._id,
+        range: currentSheet + "!A2:B" + (studentNames.length + 1),
+        values,
+      }),
+    });
+
+    alert(`Attendance marked: ${status} ✅`);
+  }
+
+  // 🔹 Event bindings
   loadBtn.addEventListener("click", loadRecordBook);
   saveBtn.addEventListener("click", saveGrades);
   finalizeBtn.addEventListener("click", finalizeGrades);
+  presentBtn.addEventListener("click", () => markAttendance("Present"));
+  absentBtn.addEventListener("click", () => markAttendance("Absent"));
+  excusedBtn.addEventListener("click", () => markAttendance("Excused"));
 
   // Init
   await loadClasses();
