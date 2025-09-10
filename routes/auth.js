@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { register, login, assignRole } = require("../controllers/authController");
-const { authRequired, requireRole } = require("../middleware/roleMiddleware");
+const { authRequired, requireRole } = require("../middleware/authMiddleware");
 
 // Public
 router.post("/register", register);
