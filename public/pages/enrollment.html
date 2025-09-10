@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enrollment - AGRITECH</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/script.js"></script>
+  <script defer src="../js/enrollment.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>Enrollment Form</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <form id="enrollmentForm">
+      <!-- Student Info -->
+      <h2>Student Information</h2>
+      <label>Full Name:</label>
+      <input type="text" name="name" required>
+
+      <label>LRN (Learner Reference Number):</label>
+      <input type="text" name="lrn" required maxlength="12">
+
+      <label>Grade Level:</label>
+      <select name="level" id="levelSelect" required>
+        <option value="">-- Select --</option>
+        <option value="junior">Junior High</option>
+        <option value="senior">Senior High</option>
+      </select>
+
+      <!-- Dynamic Strand -->
+      <div id="strandSection" style="display:none;">
+        <label>Strand:</label>
+        <select name="strand" id="strandSelect"></select>
+      </div>
+
+      <label>School Year:</label>
+      <select name="schoolYear" required>
+        <option value="2024-2025">2024-2025</option>
+        <option value="2025-2026">2025-2026</option>
+      </select>
+
+      <button type="submit">Submit Enrollment</button>
+    </form>
+  </main>
+</body>
+</html>
