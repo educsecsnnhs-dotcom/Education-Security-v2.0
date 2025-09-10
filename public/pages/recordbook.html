@@ -11,41 +11,33 @@
 <body>
   <header>
     <button onclick="window.location.href='welcome.html'">⬅ Back</button>
-    <h1>📚 Record Book</h1>
+    <h1>📓 Teacher Record Book</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
   <main>
-    <!-- Class & Subject selection -->
+    <!-- Class Selector -->
     <section>
-      <h2>📖 My Classes</h2>
-      <label for="classSelect">Class:</label>
+      <h2>🎓 Select Class</h2>
       <select id="classSelect"></select>
-
-      <label for="subjectSelect">Subject:</label>
-      <select id="subjectSelect"></select>
-
-      <button id="loadBtn">Load Students</button>
+      <button id="loadRecordBook">Load Record Book</button>
     </section>
 
-    <!-- Student list -->
+    <!-- Spreadsheet -->
     <section>
-      <h2>👥 Students</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Attendance</th>
-            <th>Quarter 1</th>
-            <th>Quarter 2</th>
-            <th>Quarter 3</th>
-            <th>Quarter 4</th>
-            <th>Final</th>
-            <th>Save</th>
-          </tr>
-        </thead>
-        <tbody id="studentsTable"></tbody>
-      </table>
+      <h2>📝 Spreadsheet</h2>
+      <div id="spreadsheetContainer">
+        <table border="1" id="recordTable">
+          <thead id="recordHead"></thead>
+          <tbody id="recordBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section>
+      <button id="saveGrades">💾 Save Changes</button>
+      <button id="finalizeGrades">✅ Finalize Grades</button>
     </section>
   </main>
 </body>
