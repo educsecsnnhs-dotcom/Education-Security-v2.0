@@ -1,5 +1,5 @@
 // controllers/principalController.js
-const Enrollee = require("../models/Enrollee"); // ✅ FIXED
+const Enrollee = require("../models/Enrollee"); // ✅ fixed name
 const User = require("../models/User");
 const Class = require("../models/Class");
 const RecordBook = require("../models/RecordBook");
@@ -35,7 +35,7 @@ exports.getEnrollmentStats = async (req, res) => {
     const enrollments = await Enrollee.aggregate([
       {
         $group: {
-          _id: { strand: "$strand", section: "$assignedSection" },
+          _id: { strand: "$strand", section: "$section" },
           count: { $sum: 1 },
         },
       },
@@ -65,12 +65,11 @@ exports.setLimit = async (req, res) => {
 exports.getDepartmentsOverview = async (req, res) => {
   try {
     const admins = await User.find({ role: "Admin" }).select("fullName department");
-    const classes = await Class.find().populate("moderatorId", "fullName").select("name department moderatorId");
+    const classes = await Class.find()
+      .populate("moderatorId", "fullName")
+      .select("name department moderatorId");
 
-    res.json({
-      admins,
-      classes,
-    });
+    res.json({ admins, classes });
   } catch (err) {
     res.status(500).json({ message: "Error fetching departments", error: err.message });
   }
@@ -102,7 +101,7 @@ exports.getGlobalGrades = async (req, res) => {
 };
 
 /**
- * Assign Registrar or Admin (only Principal can do this)
+ * Assign Registrar or Admin
  */
 exports.assignHighRole = async (req, res) => {
   try {
