@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <title>Welcome - AGRITECH</title>
   <link rel="stylesheet" href="styles.css">
-  <script defer src="js/auth.js"></script>   <!-- session helpers -->
-  <script defer src="js/script.js"></script> <!-- shared utils -->
-  <script defer src="js/menu.js"></script>   <!-- role-based menu -->
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/script.js"></script>
+  <script defer src="js/menu.js"></script>
+  <script defer src="js/welcome.js"></script> <!-- new -->
 </head>
 <body>
   <!-- Top bar -->
@@ -15,18 +16,26 @@
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
-  <!-- Collapsible Sidebar (dynamic) -->
+  <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
-    <ul id="menuList">
-      <!-- Menu items injected by menu.js -->
-    </ul>
+    <ul id="menuList"></ul>
   </nav>
 
   <!-- Main Content -->
   <main>
-    <div id="viewer">
-      <embed src="school-info.pdf" type="application/pdf" width="100%" height="600px" />
-    </div>
+    <section>
+      <h2>📌 School-wide Announcements</h2>
+      <div id="schoolAnnouncements">
+        <!-- Filled by welcome.js -->
+      </div>
+    </section>
+
+    <section>
+      <h2>🏫 School Info</h2>
+      <div id="viewer">
+        <embed src="school-info.pdf" type="application/pdf" width="100%" height="600px" />
+      </div>
+    </section>
   </main>
 </body>
 </html>
