@@ -29,6 +29,8 @@ app.use("/api/principal", require("./routes/principal"));
 app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/announcements", require("./routes/announcement"));
+app.use("/api/attendance", require("./routes/attendance"));
+
 
 // Serve frontend from "public"
 app.use(express.static(path.join(__dirname, "public")));
