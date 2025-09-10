@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SSG Management</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/script.js"></script>
+  <script defer src="js/ssg.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <h1>🎓 SSG Management</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <!-- Create Post (SSG only) -->
+    <section id="createSection" style="display: none;">
+      <h2>📝 Create New Post</h2>
+      <input type="text" id="postTitle" placeholder="Title">
+      <textarea id="postContent" placeholder="Write your announcement or event..."></textarea>
+      <button id="createPostBtn">Post</button>
+    </section>
+
+    <!-- Posts -->
+    <section>
+      <h2>📢 SSG Announcements & Events</h2>
+      <div id="postsList"></div>
+    </section>
+  </main>
+</body>
+</html>
