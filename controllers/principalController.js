@@ -1,12 +1,11 @@
 // controllers/principalController.js
-const Enrollment = require("../models/Enrollment");
+const Enrollee = require("../models/Enrollee"); // ✅ FIXED
 const User = require("../models/User");
 const Class = require("../models/Class");
 const RecordBook = require("../models/RecordBook");
 
 /**
  * Get school-wide dashboard
- * Shows total enrolled students, departments, and staff count
  */
 exports.getDashboard = async (req, res) => {
   try {
@@ -33,10 +32,10 @@ exports.getDashboard = async (req, res) => {
  */
 exports.getEnrollmentStats = async (req, res) => {
   try {
-    const enrollments = await Enrollment.aggregate([
+    const enrollments = await Enrollee.aggregate([
       {
         $group: {
-          _id: { strand: "$strand", section: "$section" },
+          _id: { strand: "$strand", section: "$assignedSection" },
           count: { $sum: 1 },
         },
       },
@@ -53,11 +52,7 @@ exports.getEnrollmentStats = async (req, res) => {
  */
 exports.setLimit = async (req, res) => {
   try {
-    const { type, key, limit } = req.body; 
-    // type = "section" | "strand"
-    // key = sectionName or strandName
-
-    // Save this in EnrollmentSettings (we can add a config model)
+    const { type, key, limit } = req.body;
     res.json({ message: `Limit set for ${type}: ${key} = ${limit}` });
   } catch (err) {
     res.status(500).json({ message: "Error setting limit", error: err.message });
