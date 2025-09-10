@@ -20,18 +20,28 @@
     <section>
       <h2>🎓 Select Class</h2>
       <select id="classSelect"></select>
+      <select id="sheetSelect"></select>
+      <input type="text" id="rangeInput" placeholder="e.g. A1:Z50" value="A1:Z50">
       <button id="loadRecordBook">Load Record Book</button>
     </section>
 
     <!-- Spreadsheet -->
     <section>
       <h2>📝 Spreadsheet</h2>
-      <div id="spreadsheetContainer">
+      <div id="spreadsheetContainer" style="overflow-x:auto;">
         <table border="1" id="recordTable">
           <thead id="recordHead"></thead>
           <tbody id="recordBody"></tbody>
         </table>
       </div>
+    </section>
+
+    <!-- Attendance -->
+    <section>
+      <h2>📅 Attendance</h2>
+      <button id="markPresent">Mark Present</button>
+      <button id="markAbsent">Mark Absent</button>
+      <button id="markExcused">Mark Excused</button>
     </section>
 
     <!-- Actions -->
