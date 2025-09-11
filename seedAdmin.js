@@ -14,7 +14,7 @@ async function seedAdmin() {
 
     const superAdmin = new User({
       email,
-      password: encryptPassword(password), // ✅ encrypt like register()
+      password: encryptPassword(password), 
       role: "SuperAdmin",
       extraRoles: [],
     });
@@ -26,4 +26,4 @@ async function seedAdmin() {
   }
 }
 
-module.exports = seedAdmin; // ✅ export function
+module.exports = seedAdmin; 
