@@ -1,3 +1,4 @@
+// public/js/recordbook.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
@@ -8,7 +9,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  const classSelect = document.getElementById("classSelect");
+  const sectionSelect = document.getElementById("sectionSelect");
+  const subjectSelect = document.getElementById("subjectSelect");
   const sheetSelect = document.getElementById("sheetSelect");
   const rangeInput = document.getElementById("rangeInput");
   const loadBtn = document.getElementById("loadRecordBook");
@@ -26,14 +28,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentRange = "A1:Z50";
   let gradesMatrix = []; // editable copy
 
-  // 🔹 Load teacher’s assigned classes
-  async function loadClasses() {
-    const classes = await apiFetch(`/api/classes/teacher/${user._id}`);
-    classes.forEach(cls => {
+  // 🔹 Load teacher’s assigned sections + subjects
+  async function loadSections() {
+    const assignments = await apiFetch(`/api/sections/teacher/${user._id}`);
+    assignments.forEach(asg => {
       const opt = document.createElement("option");
-      opt.value = cls._id;
-      opt.textContent = cls.name;
-      classSelect.appendChild(opt);
+      opt.value = JSON.stringify({ sectionId: asg.section._id, subject: asg.subject });
+      opt.textContent = `${asg.section.name} - ${asg.subject}`;
+      sectionSelect.appendChild(opt);
     });
   }
 
@@ -51,19 +53,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔹 Load record book from backend
   async function loadRecordBook() {
-    const classId = classSelect.value;
-    if (!classId) return alert("Select a class first!");
+    const selected = sectionSelect.value;
+    if (!selected) return alert("Select a section + subject first!");
 
-    const cls = await apiFetch(`/api/classes/${classId}`);
-    if (!cls.recordBookId) {
+    const { sectionId, subject } = JSON.parse(selected);
+
+    // Check if record book exists
+    const existing = await apiFetch(`/api/recordbook/find?sectionId=${sectionId}&subject=${encodeURIComponent(subject)}`);
+    if (!existing) {
       // Auto-create if none exists
       const created = await apiFetch(`/api/recordbook/create`, {
         method: "POST",
-        body: JSON.stringify({ classId }),
+        body: JSON.stringify({ sectionId, subject, teacherId: user._id }),
       });
       currentRecordBook = created.recordBook;
     } else {
-      currentRecordBook = await apiFetch(`/api/recordbook/${cls.recordBookId}`);
+      currentRecordBook = existing;
     }
 
     await loadSheets(currentRecordBook.sheetId);
@@ -107,8 +112,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         td.dataset.row = i;
         td.dataset.col = j;
 
-        // Freeze first column (student name / LRN)
-        if (j > 0) {
+        // Freeze first two columns (LRN + Name)
+        if (j > 1) {
           td.contentEditable = true;
         } else {
           td.style.backgroundColor = "#f0f0f0";
@@ -162,17 +167,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 🔹 Mark attendance helper
   async function markAttendance(status) {
     if (!currentRecordBook) return;
-    const selected = Array.from(recordBody.querySelectorAll("tr td:first-child"));
-    const studentNames = selected.map(td => td.textContent);
 
-    // Example: mark entire range as "Present"
-    const values = studentNames.map(name => [name, status]);
+    // Apply attendance in the "Attendance" column (C)
+    const studentRows = gradesMatrix.slice(1); // exclude header
+    const values = studentRows.map(row => [row[0], row[1], status]); // [LRN, Name, Status]
 
     await apiFetch(`/api/recordbook/attendance`, {
       method: "POST",
       body: JSON.stringify({
         recordBookId: currentRecordBook._id,
-        range: currentSheet + "!A2:B" + (studentNames.length + 1),
+        range: currentSheet + "!A2:C" + (studentRows.length + 1),
         values,
       }),
     });
@@ -189,5 +193,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   excusedBtn.addEventListener("click", () => markAttendance("Excused"));
 
   // Init
-  await loadClasses();
+  await loadSections();
 });
