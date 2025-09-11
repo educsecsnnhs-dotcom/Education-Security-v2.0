@@ -39,19 +39,28 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch("/api/lifecycle/enroll", {
         method: "POST",
-        body: formData, // ✅ FormData automatically sets multipart headers
+        body: formData,
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || "Enrollment failed");
+        // Show specific backend error if available
+        if (data.error) {
+          alert(`❌ Enrollment failed: ${data.error}`);
+        } else if (data.message) {
+          alert(`❌ Enrollment failed: ${data.message}`);
+        } else {
+          alert("❌ Enrollment failed. Please try again.");
+        }
+        return;
       }
 
       alert("✅ Enrollment submitted successfully! Please wait for registrar approval.");
-      window.location.href = "../welcome.html"; // back to main menu
+      window.location.href = "../welcome.html";
     } catch (err) {
-      alert("❌ Enrollment failed. Please try again.");
-      console.error("Enrollment error:", err);
+      console.error(err);
+      alert("❌ Network error. Please check your connection and try again.");
     }
   });
 });
