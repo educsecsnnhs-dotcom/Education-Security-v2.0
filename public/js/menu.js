@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { name: "Enrollee", link: "pages/registrar.html", icon: "🧾" },
       { name: "Enrolled", link: "pages/enrolled.html", icon: "✅" },
       { name: "Archives", link: "pages/archives.html", icon: "📂" },
-      { name: "Role Management", link: "pages/roles.html", icon: "👥" }, // ✅ Added
+      { name: "Role Management", link: "pages/roles.html", icon: "👥" }, 
     ],
     Admin: [
       { name: "Management", link: "pages/admin.html", icon: "⚙️" },
