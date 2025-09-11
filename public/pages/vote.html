@@ -3,48 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>Student Voting</title>
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../style.css">
   <script defer src="../js/auth.js"></script>
-  <script defer src="../js/script.js"></script>
+  <script defer src="../js/api.js"></script>
   <script defer src="../js/vote.js"></script>
 </head>
 <body>
   <header>
-    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <button onclick="window.location.href='../welcome.html'">⬅ Back</button>
     <h1>🗳️ Student Voting</h1>
-    <button id="logoutBtn" class="logout">Logout</button>
+    <button onclick="Auth.logout()" class="logout">Logout</button>
   </header>
 
   <main>
     <!-- Student Info -->
-    <section>
+    <section class="student-info">
       <h2>👤 My Info</h2>
-      <p>Name: <span id="studentName"></span></p>
-      <p>LRN: <span id="studentLRN"></span></p>
-      <p>Grade Level: <span id="studentGrade"></span></p>
-      <p>Section: <span id="studentSection"></span></p>
+      <p><b>Name:</b> <span id="studentName"></span></p>
+      <p><b>LRN:</b> <span id="studentLRN"></span></p>
+      <p><b>Grade Level:</b> <span id="studentGrade"></span></p>
+      <p><b>Section:</b> <span id="studentSection"></span></p>
     </section>
 
     <!-- Voting Categories -->
-    <section id="votingSection">
+    <section id="votingSection" class="voting-section hidden">
       <h2>🗳️ Elections</h2>
 
-      <div id="ssgElections">
+      <div class="vote-category">
         <h3>School-wide SSG Elections</h3>
-        <form id="ssgForm"></form>
+        <form id="ssgForm" class="candidate-list"></form>
       </div>
 
-      <div id="gradeElections">
+      <div class="vote-category">
         <h3>Grade-level Representatives</h3>
-        <form id="gradeForm"></form>
+        <form id="gradeForm" class="candidate-list"></form>
       </div>
 
-      <div id="sectionElections">
+      <div class="vote-category">
         <h3>Section Representatives</h3>
-        <form id="sectionForm"></form>
+        <form id="sectionForm" class="candidate-list"></form>
       </div>
 
-      <button id="submitVote">Submit Vote</button>
+      <button id="submitVote" class="btn-primary">✅ Submit Vote</button>
+    </section>
+
+    <!-- Already Voted -->
+    <section id="votedSection" class="hidden">
+      <h2>✅ You have already submitted your vote</h2>
+      <p>Thank you for participating in the election.</p>
+      <button onclick="window.location.href='../welcome.html'" class="btn-primary">Back to Dashboard</button>
     </section>
   </main>
 </body>
