@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { name: "Management", link: "pages/admin.html", icon: "⚙️" },
       { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
-    SuperAdmin: [], // Will see everything (we merge later)
+    SuperAdmin: [], 
     SSG: [
       { name: "SSG Management", link: "pages/ssg.html", icon: "🏛️" }
     ],
