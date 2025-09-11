@@ -1,3 +1,4 @@
+// controllers/recordbookController.js
 const RecordBook = require("../models/RecordBook");
 const Section = require("../models/Section");
 const User = require("../models/User");
@@ -10,6 +11,7 @@ const {
 
 /**
  * Create record book for a section + subject
+ * Auto-creates a Google Sheet and links it
  */
 exports.createRecordBook = async (req, res) => {
   try {
@@ -51,6 +53,24 @@ exports.createRecordBook = async (req, res) => {
 };
 
 /**
+ * Find record book by section + subject
+ */
+exports.findRecordBook = async (req, res) => {
+  try {
+    const { sectionId, subject } = req.query;
+
+    const recordBook = await RecordBook.findOne({ sectionId, subject })
+      .populate("sectionId")
+      .populate("teacher");
+
+    if (!recordBook) return res.json(null); // frontend expects null if none
+    res.json(recordBook);
+  } catch (err) {
+    res.status(500).json({ message: "Error finding record book", error: err.message });
+  }
+};
+
+/**
  * Input grades (teacher updates sheet)
  */
 exports.inputGrades = async (req, res) => {
@@ -86,6 +106,19 @@ exports.getStudentGrades = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: "Error fetching grades", error: err.message });
+  }
+};
+
+/**
+ * List all sheets (tabs) inside a record book
+ */
+exports.getSheetTabs = async (req, res) => {
+  try {
+    const { sheetId } = req.params;
+    const sheets = await listSheets(sheetId);
+    res.json(sheets);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching sheet tabs", error: err.message });
   }
 };
 
@@ -138,18 +171,5 @@ exports.getRecordBookById = async (req, res) => {
     res.json(recordBook);
   } catch (err) {
     res.status(500).json({ message: "Error fetching record book", error: err.message });
-  }
-};
-
-/**
- * Get sheet/tab names for a Google Sheet
- */
-exports.getSheetTabs = async (req, res) => {
-  try {
-    const { sheetId } = req.params;
-    const tabs = await listSheets(sheetId); // ✅ fixed to use listSheets util
-    res.json(tabs);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching sheet tabs", error: err.message });
   }
 };
