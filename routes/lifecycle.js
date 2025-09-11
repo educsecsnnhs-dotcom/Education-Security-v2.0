@@ -5,6 +5,7 @@ const express = require("express");
 const router = express.Router();
 const lifecycleController = require("../controllers/lifecycleController");
 const { authRequired } = require("../controllers/authController");
+const Enrollment = require("../models/Enrollment"); // ✅ don’t forget this
 
 // Storage setup
 const storage = multer.diskStorage({
@@ -34,6 +35,8 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
+// ================= Routes =================
+
 // Archived students
 router.get("/enrollment/archived", async (req, res) => {
   try {
@@ -50,7 +53,7 @@ router.post("/enrollment/:id/restore", lifecycleController.restoreStudent);
 // Student submits enrollment
 router.post(
   "/enroll",
-  authRequired, // must be logged in
+  authRequired,
   upload.fields([
     { name: "reportCard", maxCount: 1 },
     { name: "goodMoral", maxCount: 1 },
@@ -59,5 +62,18 @@ router.post(
   ]),
   lifecycleController.enrollStudent
 );
+
+// ================= Multer Error Handler =================
+router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({ error: "❌ File too large. Max 5MB allowed." });
+    }
+    return res.status(400).json({ error: `Multer error: ${err.message}` });
+  } else if (err.message.includes("Only PDF, JPG, and PNG")) {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err); // pass to default error handler
+});
 
 module.exports = router;
