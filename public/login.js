@@ -1,33 +1,40 @@
 // public/login.js
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("login.js loaded ✅");
+
   const form = document.getElementById("loginForm");
   const togglePassword = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("password");
 
-  // 👁️ Toggle password visibility
-  if (togglePassword) {
+  if (togglePassword && passwordInput) {
     togglePassword.addEventListener("click", () => {
-      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-      passwordInput.setAttribute("type", type);
-      togglePassword.textContent = type === "password" ? "👁️" : "🙈";
+      const t = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", t);
+      togglePassword.textContent = t === "password" ? "👁️" : "🙈";
     });
   }
 
-  // 📌 Form submit
+  if (!form) {
+    console.error("loginForm not found in DOM");
+    return;
+  }
+
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // ✅ stop page refresh
+    e.preventDefault();
 
     const emailOrUsername = document.getElementById("username").value.trim();
     const password = passwordInput.value.trim();
+
+    if (!emailOrUsername || !password) {
+      alert("Please fill both fields");
+      return;
+    }
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          emailOrUsername, // ✅ backend accepts both
-          password,
-        }),
+        body: JSON.stringify({ emailOrUsername, password }),
       });
 
       const data = await res.json();
@@ -37,11 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Save user to localStorage
+      // save minimal user info
       localStorage.setItem("user", JSON.stringify(data.user));
 
       alert("✅ Login successful!");
-      window.location.href = "welcome.html"; // redirect
+      window.location.href = "welcome.html";
     } catch (err) {
       console.error("Login error:", err);
       alert("❌ Network error. Please try again.");
