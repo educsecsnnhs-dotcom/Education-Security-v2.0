@@ -1061,3 +1061,50 @@ td.late {
   font-size: 0.9em;
   color: #666;
 }
+
+/* Hide helper */
+.hidden {
+  display: none !important;
+}
+
+/* Candidate card styling */
+.candidate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.candidate-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.candidate-item input {
+  display: none; /* hide radio */
+}
+
+.candidate-card {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.candidate-item input:checked + .candidate-card {
+  border-color: #007bff;
+  background: #eaf3ff;
+}
+
+.candidate-name {
+  display: block;
+  font-weight: bold;
+}
+
+.candidate-position {
+  display: block;
+  font-size: 0.9em;
+  color: #555;
+}
