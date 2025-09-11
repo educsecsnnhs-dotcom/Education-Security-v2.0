@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const path = require("path");
+const fs = require("fs");
 
 dotenv.config();
 
@@ -44,6 +46,18 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// Ensure uploads folder exists
+if (!fs.existsSync("uploads/announcements")) {
+  fs.mkdirSync("uploads/announcements", { recursive: true });
+}
+
+// Serve uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Routes
+const announcementRoutes = require("./routes/announcements");
+app.use("/api/announcements", authMiddleware, announcementRoutes);
 
 // Start Server + Seed SuperAdmin
 app.listen(PORT, async () => {
