@@ -1,41 +1,41 @@
 // seedAdmin.js
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const connectDB = require("./config/db");
-const User = require("./models/User"); // adjust path if different
+const User = require("./models/User");
 const { encryptPassword } = require("./utils/caesar");
 
 dotenv.config();
 
-const seedAdmin = async () => {
+(async () => {
   try {
-    await connectDB();
-
-    const username = "superadmin";
-    const plainPassword = "superpassword"; // CHANGE this later
-    const encrypted = encryptPassword(plainPassword);
-
-    // check if SuperAdmin already exists
-    let existing = await User.findOne({ username });
-    if (existing) {
-      console.log("⚠️ SuperAdmin already exists:", existing.username);
-      process.exit();
-    }
-
-    const superAdmin = new User({
-      username,
-      password: encrypted,
-      role: "SuperAdmin",
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
 
-    await superAdmin.save();
-    console.log("✅ SuperAdmin seeded:", username);
+    const email = "superadmin@school.com";
+    const password = "superpassword";
+    const encryptedPassword = encryptPassword(password);
 
-    process.exit();
+    let superAdmin = await User.findOne({ role: "SuperAdmin" });
+
+    if (!superAdmin) {
+      superAdmin = new User({
+        email,
+        password: encryptedPassword,
+        role: "SuperAdmin",
+        extraRoles: [],
+      });
+
+      await superAdmin.save();
+      console.log("✅ SuperAdmin created:", email, "(password:", password, ")");
+    } else {
+      console.log("ℹ️ SuperAdmin already exists:", superAdmin.email);
+    }
+
+    mongoose.connection.close();
   } catch (err) {
     console.error("❌ Error seeding SuperAdmin:", err);
-    process.exit(1);
+    mongoose.connection.close();
   }
-};
-
-seedAdmin();
+})();
