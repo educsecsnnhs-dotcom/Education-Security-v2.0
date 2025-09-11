@@ -1,6 +1,7 @@
 // seedAdmin.js
 const mongoose = require("mongoose");
 const User = require("./models/User");
+const { encryptPassword } = require("./utils/caesar"); 
 require("dotenv").config();
 
 async function seedAdmin() {
@@ -11,14 +12,15 @@ async function seedAdmin() {
     });
 
     const email = "superadmin@school.com";
-    const password = "superadmin123"; 
+    const rawPassword = "superadmin123"; 
+    const encryptedPassword = encryptPassword(rawPassword); 
     const role = "SuperAdmin";
 
     let user = await User.findOne({ email });
 
     if (user) {
       console.log("⚠️ SuperAdmin already exists. Updating...");
-      user.password = password;
+      user.password = encryptedPassword;
       user.role = role;
       user.extraRoles = [];
       await user.save();
@@ -26,7 +28,7 @@ async function seedAdmin() {
       console.log("✅ Creating new SuperAdmin...");
       user = new User({
         email,
-        password,
+        password: encryptedPassword, 
         role,
         extraRoles: [],
       });
@@ -43,6 +45,5 @@ async function seedAdmin() {
     console.error("❌ Error seeding SuperAdmin:", err);
   }
 }
-
 
 module.exports = seedAdmin;
