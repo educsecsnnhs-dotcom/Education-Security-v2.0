@@ -10,16 +10,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const enrolleeList = document.getElementById("enrolleeList");
+  const searchName = document.getElementById("searchName");
+  const filterLevel = document.getElementById("filterLevel");
+  const filterStrand = document.getElementById("filterStrand");
+  const applyFiltersBtn = document.getElementById("applyFilters");
 
-  try {
-    const enrollees = await apiFetch("/api/enrollment/pending");
+  let allEnrollees = [];
 
-    if (!enrollees.length) {
+  async function loadEnrollees() {
+    try {
+      const enrollees = await apiFetch("/api/enrollment/pending");
+      allEnrollees = enrollees;
+      renderEnrollees(enrollees);
+    } catch (err) {
+      console.error("Failed to load enrollees:", err);
+      enrolleeList.innerHTML = "<p>⚠ Failed to load pending enrollees.</p>";
+    }
+  }
+
+  function renderEnrollees(list) {
+    enrolleeList.innerHTML = "";
+
+    if (!list.length) {
       enrolleeList.innerHTML = "<p>No pending enrollees ✅</p>";
       return;
     }
 
-    enrollees.forEach((enrollee) => {
+    list.forEach((enrollee) => {
       const card = document.createElement("div");
       card.className = "enrollee-card";
 
@@ -78,24 +95,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       enrolleeList.appendChild(card);
     });
-
-    // Handle approve/reject
-    enrolleeList.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("approve-btn")) {
-        const id = e.target.dataset.id;
-        await apiFetch(`/api/enrollment/${id}/approve`, { method: "POST" });
-        alert("✅ Enrollee approved");
-        location.reload();
-      }
-      if (e.target.classList.contains("reject-btn")) {
-        const id = e.target.dataset.id;
-        await apiFetch(`/api/enrollment/${id}/reject`, { method: "POST" });
-        alert("❌ Enrollee rejected");
-        location.reload();
-      }
-    });
-  } catch (err) {
-    console.error("Failed to load enrollees:", err);
-    enrolleeList.innerHTML = "<p>⚠ Failed to load pending enrollees.</p>";
   }
+
+  // Filter logic
+  function applyFilters() {
+    const search = searchName.value.toLowerCase();
+    const level = filterLevel.value;
+    const strand = filterStrand.value.toLowerCase();
+
+    const filtered = allEnrollees.filter((e) => {
+      const matchesName = e.name.toLowerCase().includes(search);
+      const matchesLevel = !level || e.level === level;
+      const matchesStrand =
+        !strand || (e.strand && e.strand.toLowerCase().includes(strand));
+      return matchesName && matchesLevel && matchesStrand;
+    });
+
+    renderEnrollees(filtered);
+  }
+
+  applyFiltersBtn.addEventListener("click", applyFilters);
+
+  // Approve/Reject buttons
+  enrolleeList.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("approve-btn")) {
+      const id = e.target.dataset.id;
+      await apiFetch(`/api/enrollment/${id}/approve`, { method: "POST" });
+      alert("✅ Enrollee approved");
+      loadEnrollees();
+    }
+    if (e.target.classList.contains("reject-btn")) {
+      const id = e.target.dataset.id;
+      await apiFetch(`/api/enrollment/${id}/reject`, { method: "POST" });
+      alert("❌ Enrollee rejected");
+      loadEnrollees();
+    }
+  });
+
+  // Initial load
+  loadEnrollees();
 });
