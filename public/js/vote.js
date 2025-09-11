@@ -1,80 +1,83 @@
-// vote.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
   if (user.role !== "Student") {
     alert("Access denied. Students only.");
-    window.location.href = "welcome.html";
+    window.location.href = "../welcome.html";
     return;
   }
 
-  // Show student info
+  // Student Info
   document.getElementById("studentName").textContent = user.name || "Unknown";
   document.getElementById("studentLRN").textContent = user.lrn || "N/A";
   document.getElementById("studentGrade").textContent = user.grade || "N/A";
-  document.getElementById("studentSection").textContent = user.section || "N/A";
+  document.getElementById("studentSection").textContent = user.section?.name || "N/A";
+
+  const votingSection = document.getElementById("votingSection");
+  const votedSection = document.getElementById("votedSection");
+  const submitBtn = document.getElementById("submitVote");
+
+  // 🔹 1. Check if student has already voted
+  try {
+    const alreadyVoted = await apiFetch(`/api/ssg/voted/${user._id}`);
+    if (alreadyVoted?.voted) {
+      votedSection.classList.remove("hidden");
+      return;
+    }
+  } catch (err) {
+    console.error("Vote check failed:", err);
+  }
+
+  // If not voted, show voting form
+  votingSection.classList.remove("hidden");
 
   const ssgForm = document.getElementById("ssgForm");
   const gradeForm = document.getElementById("gradeForm");
   const sectionForm = document.getElementById("sectionForm");
 
-  // Fetch candidates (school-wide, grade-level, section-level)
-  const candidates = await apiFetch(`/api/ssg/candidates?grade=${user.grade}&section=${user.section}`);
-
-  // Populate SSG candidates
-  if (candidates.ssg && candidates.ssg.length > 0) {
-    candidates.ssg.forEach(c => {
-      const label = document.createElement("label");
-      label.innerHTML = `
-        <input type="radio" name="ssgVote" value="${c._id}" />
-        ${c.name} - ${c.position}
-      `;
-      ssgForm.appendChild(label);
-      ssgForm.appendChild(document.createElement("br"));
-    });
-  } else {
-    ssgForm.innerHTML = "<p>No SSG candidates available.</p>";
+  // 🔹 2. Fetch candidates
+  let candidates;
+  try {
+    candidates = await apiFetch(`/api/ssg/candidates?grade=${user.grade}&section=${user.section?.name}`);
+  } catch (err) {
+    console.error("Error fetching candidates:", err);
+    alert("⚠️ Failed to load candidates.");
+    return;
   }
 
-  // Populate Grade-level candidates
-  if (candidates.grade && candidates.grade.length > 0) {
-    candidates.grade.forEach(c => {
-      const label = document.createElement("label");
-      label.innerHTML = `
-        <input type="radio" name="gradeVote" value="${c._id}" />
-        ${c.name} - ${c.position}
-      `;
-      gradeForm.appendChild(label);
-      gradeForm.appendChild(document.createElement("br"));
-    });
-  } else {
-    gradeForm.innerHTML = "<p>No grade-level candidates available.</p>";
+  // Render candidates with nicer UI
+  function renderCandidates(list, form, groupName, emptyMsg) {
+    if (list && list.length > 0) {
+      list.forEach(c => {
+        const wrapper = document.createElement("label");
+        wrapper.classList.add("candidate-item");
+        wrapper.innerHTML = `
+          <input type="radio" name="${groupName}" value="${c._id}" />
+          <div class="candidate-card">
+            <span class="candidate-name">${c.name}</span>
+            <span class="candidate-position">${c.position}</span>
+          </div>
+        `;
+        form.appendChild(wrapper);
+      });
+    } else {
+      form.innerHTML = `<p class="empty">${emptyMsg}</p>`;
+    }
   }
 
-  // Populate Section candidates
-  if (candidates.section && candidates.section.length > 0) {
-    candidates.section.forEach(c => {
-      const label = document.createElement("label");
-      label.innerHTML = `
-        <input type="radio" name="sectionVote" value="${c._id}" />
-        ${c.name} - ${c.position}
-      `;
-      sectionForm.appendChild(label);
-      sectionForm.appendChild(document.createElement("br"));
-    });
-  } else {
-    sectionForm.innerHTML = "<p>No section-level candidates available.</p>";
-  }
+  renderCandidates(candidates?.ssg, ssgForm, "ssgVote", "No SSG candidates available.");
+  renderCandidates(candidates?.grade, gradeForm, "gradeVote", "No grade-level candidates available.");
+  renderCandidates(candidates?.section, sectionForm, "sectionVote", "No section-level candidates available.");
 
-  // Submit vote
-  document.getElementById("submitVote").addEventListener("click", async () => {
+  // 🔹 3. Submit vote
+  submitBtn.addEventListener("click", async () => {
     const selectedSSG = document.querySelector("input[name='ssgVote']:checked")?.value;
     const selectedGrade = document.querySelector("input[name='gradeVote']:checked")?.value;
     const selectedSection = document.querySelector("input[name='sectionVote']:checked")?.value;
 
-    if (!selectedSSG && !selectedGrade && !selectedSection) {
-      alert("Please select at least one candidate.");
+    if (!selectedSSG || !selectedGrade || !selectedSection) {
+      alert("⚠️ Please select a candidate in all categories.");
       return;
     }
 
@@ -86,16 +89,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-      const res = await apiFetch("/api/ssg/vote", {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      await apiFetch("/api/ssg/vote", {
         method: "POST",
         body: JSON.stringify(payload),
       });
 
-      alert("✅ Vote submitted successfully!");
-      window.location.href = "welcome.html";
+      alert("✅ Your vote has been submitted successfully!");
+      window.location.href = "../welcome.html";
     } catch (err) {
       console.error("Vote failed:", err);
       alert("❌ Failed to submit vote.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "✅ Submit Vote";
     }
   });
 });
