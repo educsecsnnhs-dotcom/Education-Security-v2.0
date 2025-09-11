@@ -1108,3 +1108,24 @@ td.late {
   font-size: 0.9em;
   color: #555;
 }
+
+.announcement-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.announcement-card .post-header {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.announcement-card .post-content {
+  margin: 0.5rem 0;
+}
+.announcement-card .post-images img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
