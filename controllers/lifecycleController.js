@@ -1,3 +1,5 @@
+//controllers/lifecycleController.js
+
 const Enrollment = require("../models/Enrollment");
 const User = require("../models/User");
 
