@@ -15,6 +15,20 @@
   </header>
 
   <main>
+    <!-- 🔍 Filters -->
+    <section class="card">
+      <h2>🔍 Search & Filters</h2>
+      <input type="text" id="searchName" placeholder="Search by name...">
+      <select id="filterLevel">
+        <option value="">All Levels</option>
+        <option value="junior">Junior High</option>
+        <option value="senior">Senior High</option>
+      </select>
+      <input type="text" id="filterStrand" placeholder="Filter by strand (e.g. STEM)">
+      <button id="applyFilters">Apply</button>
+    </section>
+
+    <!-- 📝 Enrollment Requests -->
     <section class="card">
       <h2>📋 Enrollment Requests</h2>
       <div id="enrolleeList" class="enrollee-container"></div>
