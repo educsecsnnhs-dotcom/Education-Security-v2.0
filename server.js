@@ -16,39 +16,10 @@ app.use(morgan("dev"));
 
 // MongoDB connection
 const connectDB = require("./config/db");
-const User = require("./models/User");
-const { encryptPassword } = require("./utils/caesar");
+connectDB();
 
-// Ensure SuperAdmin exists
-async function ensureSuperAdmin() {
-  try {
-    const email = process.env.SUPERADMIN_EMAIL || "superadmin@school.com";
-    const password = process.env.SUPERADMIN_PASSWORD || "superpassword";
-
-    const existing = await User.findOne({ role: "SuperAdmin" });
-    if (existing) {
-      console.log("✅ SuperAdmin already exists:", existing.email);
-      return;
-    }
-
-    const superAdmin = new User({
-      email,
-      password: encryptPassword(password),
-      role: "SuperAdmin",
-      extraRoles: [],
-    });
-
-    await superAdmin.save();
-    console.log("🎉 SuperAdmin created:", email);
-  } catch (err) {
-    console.error("❌ Error ensuring SuperAdmin:", err.message);
-  }
-}
-
-// Connect DB and ensure SuperAdmin
-connectDB().then(() => {
-  ensureSuperAdmin();
-});
+// ✅ Import Seeder
+const seedAdmin = require("./seedAdmin");
 
 // API Routes
 app.use("/api/auth", require("./routes/auth"));
@@ -70,4 +41,9 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// Start Server + Seed SuperAdmin
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  await seedAdmin(); // ✅ Create SuperAdmin if missing
+});
