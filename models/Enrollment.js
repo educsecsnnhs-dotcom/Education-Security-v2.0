@@ -12,15 +12,18 @@ const enrollmentSchema = new mongoose.Schema(
     schoolYear: { type: String, required: true },
     yearLevel: { type: Number },
 
-    // New
+    // Enrollment Status
     status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+
+    // Required Documents
     documents: {
-      reportCard: { type: String },
+      reportCard: { type: String },       // path or URL
       goodMoral: { type: String },
       birthCertificate: { type: String },
-      others: [{ type: String }],
+      others: [{ type: String }],         // optional additional uploads
     },
 
+    // Flags
     graduated: { type: Boolean, default: false },
     archived: { type: Boolean, default: false },
     archiveReason: { type: String, default: null },
@@ -29,4 +32,3 @@ const enrollmentSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Enrollment", enrollmentSchema);
-
