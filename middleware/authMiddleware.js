@@ -1,5 +1,3 @@
-// middleware/roleMiddleware.js
-
 /**
  * Ensure user is authenticated
  */
@@ -12,7 +10,7 @@ const authRequired = (req, res, next) => {
 };
 
 /**
- * Restrict access by role
+ * Restrict access by single role
  */
 const requireRole = (role) => {
   return (req, res, next) => {
@@ -20,7 +18,9 @@ const requireRole = (role) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (req.session.user.role !== role) {
+    const { role: userRole, extraRoles = [] } = req.session.user;
+
+    if (userRole !== role && !extraRoles.includes(role)) {
       return res.status(403).json({ message: `Requires role: ${role}` });
     }
 
@@ -37,8 +37,12 @@ const requireAnyRole = (roles = []) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (!roles.includes(req.session.user.role)) {
-      return res.status(403).json({ message: `Requires one of: ${roles.join(", ")}` });
+    const { role: userRole, extraRoles = [] } = req.session.user;
+
+    if (![userRole, ...extraRoles].some((r) => roles.includes(r))) {
+      return res
+        .status(403)
+        .json({ message: `Requires one of: ${roles.join(", ")}` });
     }
 
     next();
