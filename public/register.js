@@ -1,24 +1,39 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
+  const togglePassword = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("password");
 
+  // 👁️ Toggle password visibility
+  togglePassword.addEventListener("click", () => {
+    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+    passwordInput.setAttribute("type", type);
+    togglePassword.textContent = type === "password" ? "👁️" : "🙈";
+  });
+
+  // 📌 Form submit handler
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const fullName = document.getElementById("fullName").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = passwordInput.value.trim();
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-    const data = await res.json();
-    if (res.ok) {
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Registration failed");
+
+      alert("✅ Registered successfully! Please login.");
       window.location.href = "login.html";
-    } else {
-      alert(data.message || "Registration failed");
+    } catch (err) {
+      console.error(err);
+      alert("❌ " + err.message);
     }
   });
 });
