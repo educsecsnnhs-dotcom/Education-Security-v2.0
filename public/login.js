@@ -5,9 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("password");
 
   // 👁️ Toggle password visibility
-  if (togglePassword) {
+  if (togglePassword && passwordInput) {
     togglePassword.addEventListener("click", () => {
-      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      const type =
+        passwordInput.getAttribute("type") === "password" ? "text" : "password";
       passwordInput.setAttribute("type", type);
       togglePassword.textContent = type === "password" ? "👁️" : "🙈";
     });
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = passwordInput.value.trim();
 
       if (!emailOrUsername || !password) {
-        alert("❌ Please enter both username/email and password");
+        alert("Please fill in both fields");
         return;
       }
 
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ emailOrUsername, password }), // ✅ backend expects this
+          body: JSON.stringify({ emailOrUsername, password }), // ✅ matches backend
         });
 
         const data = await res.json();
@@ -40,11 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Save user in localStorage
+        // Save user to localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
 
         alert("✅ Login successful!");
-        window.location.href = "welcome.html"; // ✅ redirect after login
+        window.location.href = "welcome.html"; // redirect
       } catch (err) {
         console.error("Login error:", err);
         alert("❌ Network error. Please try again.");
