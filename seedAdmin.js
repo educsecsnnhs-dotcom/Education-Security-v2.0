@@ -7,30 +7,38 @@ const { encryptPassword } = require("./utils/caesar");
 dotenv.config();
 
 const run = async () => {
-  await mongoose.connect(process.env.MONGO_URI);
+  try {
+    console.log("MONGO_URI:", process.env.MONGO_URI); // Debug
 
-  const email = "superadmin@school.com";
-  const plainPassword = "superpassword";
-
-  let user = await User.findOne({ email });
-  if (!user) {
-    user = new User({
-      email,
-      password: encryptPassword(plainPassword),
-      role: "SuperAdmin",
-      extraRoles: [],
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
-    await user.save();
-    console.log("✅ SuperAdmin created:", email, "Password:", plainPassword);
-  } else {
-    console.log("ℹ️ SuperAdmin already exists:", user.email);
-  }
+    console.log("✅ Connected to MongoDB");
 
-  await mongoose.disconnect();
-  process.exit(0);
+    const email = "superadmin@school.com";
+    const plainPassword = "superpassword";
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = new User({
+        email,
+        password: encryptPassword(plainPassword),
+        role: "SuperAdmin",
+        extraRoles: [],
+      });
+      await user.save();
+      console.log("✅ SuperAdmin created:", email, "Password:", plainPassword);
+    } else {
+      console.log("ℹ️ SuperAdmin already exists:", user.email);
+    }
+
+    await mongoose.disconnect();
+    process.exit(0);
+  } catch (err) {
+    console.error("❌ Seeding failed:", err);
+    process.exit(1);
+  }
 };
 
-run().catch(err => {
-  console.error("❌ Seed failed:", err);
-  process.exit(1);
-});
+run();
