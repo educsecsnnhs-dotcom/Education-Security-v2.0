@@ -1,68 +1,60 @@
 // controllers/authController.js
 const User = require("../models/User");
-const { encryptPassword } = require("../utils/caesar");
+const { encrypt, decrypt } = require("../utils/caesar");
 
-/**
- * Register a new user (email + password only)
- */
+// REGISTER
 exports.register = async (req, res) => {
   try {
-    let { email, password } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Normalize email to lowercase
-    email = email.toLowerCase();
-
     const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Encrypt password before saving
-    const encryptedPassword = encryptPassword(password);
+    // Encrypt password with Caesar
+    const encryptedPassword = encrypt(password);
 
     const user = new User({
       email,
       password: encryptedPassword,
-      role: "User",
-      extraRoles: [],
+      role: "User", // default
     });
 
     await user.save();
 
-    res.status(201).json({ message: "✅ Registration successful" });
+    res.status(201).json({ message: "User registered successfully", user });
   } catch (err) {
-    console.error("❌ Register error:", err);
-    res.status(500).json({ message: "Error registering user" });
+    console.error("Register error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-/**
- * Login user (email + password only)
- */
+// LOGIN
 exports.login = async (req, res) => {
   try {
-    let { email, password } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Normalize email to lowercase
-    email = email.toLowerCase();
-
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Encrypt input password and compare with stored one
-    const encrypted = encryptPassword(password);
-    if (encrypted !== user.password) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Compare encrypted passwords
+    const encryptedInput = encrypt(password);
+    if (encryptedInput !== user.password) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // No JWTs — just return user object
     res.json({
       message: "Login successful",
       user: {
@@ -73,7 +65,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Login error:", err);
-    res.status(500).json({ message: "Error logging in" });
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
