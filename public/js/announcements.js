@@ -1,80 +1,72 @@
-// public/js/announcements.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  const deptSelect = document.getElementById("deptSelect");
-  const container = document.getElementById("deptAnnouncements");
+  const feed = document.getElementById("announcements");
   const postSection = document.getElementById("postSection");
-  const postForm = document.getElementById("postForm");
 
-  // Only SuperAdmin, Admin, Moderator can post
-  if (["SuperAdmin", "Admin", "Moderator"].includes(user.role)) {
+  // Show post form only for allowed roles
+  if (["Admin", "SSG", "Moderator"].includes(user.role)) {
     postSection.style.display = "block";
-  }
 
-  // Load departments (JHS = per subject, SHS = per strand)
-  async function loadDepartments() {
-    const depts = await apiFetch("/api/departments"); 
-    depts.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d._id;
-      opt.textContent = d.name;
-      deptSelect.appendChild(opt);
+    // Init Quill
+    const quill = new Quill("#editor", {
+      theme: "snow",
+      placeholder: "Write announcement...",
+    });
+
+    // Handle form submit
+    document.getElementById("postForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      formData.set("content", quill.root.innerHTML);
+
+      try {
+        await apiFetch("/api/announcements", {
+          method: "POST",
+          body: formData
+        });
+        alert("✅ Announcement posted!");
+        loadAnnouncements();
+        e.target.reset();
+        quill.setContents([]);
+      } catch (err) {
+        console.error(err);
+        alert("❌ Failed to post announcement");
+      }
     });
   }
 
-  // Load announcements for selected department
+  // Load announcements feed
   async function loadAnnouncements() {
-    const deptId = deptSelect.value;
-    if (!deptId) return;
+    feed.innerHTML = "<p>Loading...</p>";
+    try {
+      const announcements = await apiFetch("/api/announcements");
+      feed.innerHTML = "";
 
-    container.innerHTML = "<p>Loading...</p>";
-
-    const anns = await apiFetch(`/api/announcements/department/${deptId}`);
-    container.innerHTML = "";
-
-    if (anns.length === 0) {
-      container.innerHTML = "<p>No announcements for this department yet.</p>";
-      return;
+      announcements.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "announcement-card";
+        div.innerHTML = `
+          <div class="post-header">
+            <b>${post.author.name}</b> (${post.author.role})
+            <span>📅 ${new Date(post.createdAt).toLocaleString()}</span>
+            <span>🎯 ${post.visibility === "school" ? "School-wide" : post.target}</span>
+          </div>
+          <div class="post-content">${post.content}</div>
+          ${
+            post.images && post.images.length > 0
+              ? `<div class="post-images">${post.images.map(img => `<img src="${img}" alt="post image">`).join("")}</div>`
+              : ""
+          }
+        `;
+        feed.appendChild(div);
+      });
+    } catch (err) {
+      feed.innerHTML = "<p>⚠️ Failed to load announcements.</p>";
     }
-
-    anns.forEach(a => {
-      const div = document.createElement("div");
-      div.className = "announcement-card";
-      div.innerHTML = `
-        <h3>${a.title}</h3>
-        <p>${a.content}</p>
-        <small>Posted: ${new Date(a.createdAt).toLocaleString()}</small>
-        <hr/>
-      `;
-      container.appendChild(div);
-    });
   }
 
-  // Handle post form submit
-  postForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const deptId = deptSelect.value;
-    if (!deptId) return alert("Select a department first!");
-
-    const title = document.getElementById("title").value.trim();
-    const content = document.getElementById("content").value.trim();
-
-    await apiFetch("/api/announcements/department", {
-      method: "POST",
-      body: JSON.stringify({ deptId, title, content }),
-    });
-
-    alert("Announcement posted ✅");
-    postForm.reset();
-    await loadAnnouncements();
-  });
-
-  // Bind dept change event
-  deptSelect.addEventListener("change", loadAnnouncements);
-
-  // Init
-  await loadDepartments();
+  loadAnnouncements();
 });
