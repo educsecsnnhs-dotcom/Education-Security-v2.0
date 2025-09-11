@@ -15,15 +15,18 @@ document.addEventListener("DOMContentLoaded", () => {
       { name: "Grades", link: "pages/grades.html", icon: "📊" },
       { name: "Attendance", link: "pages/attendance.html", icon: "🕒" },
       { name: "Vote", link: "pages/vote.html", icon: "🗳️" },
+      { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
     Moderator: [
       { name: "Record Book", link: "pages/recordbook.html", icon: "📚" }
+      { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
     Registrar: [
       { name: "Enrollee", link: "pages/registrar.html", icon: "🧾" },
       { name: "Enrolled", link: "pages/enrolled.html", icon: "✅" },
       { name: "Archives", link: "pages/archives.html", icon: "📂" },
-      { name: "Role Management", link: "pages/roles.html", icon: "👥" }, 
+      { name: "Role Management", link: "pages/roles.html", icon: "👥" },
+      { name: "Announcements", link: "pages/announcements.html", icon: "📢" }, 
     ],
     Admin: [
       { name: "Management", link: "pages/admin.html", icon: "⚙️" },
