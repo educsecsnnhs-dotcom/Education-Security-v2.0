@@ -1,4 +1,3 @@
-// menu.js
 document.addEventListener("DOMContentLoaded", () => {
   const user = Auth.getUser();
   const menuList = document.getElementById("menuList");
@@ -8,17 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Menu definitions
   const menus = {
-    User: [
-      { name: "Enrollment", link: "enrollment.html" },
-    ],
+    User: [{ name: "Enrollment", link: "enrollment.html" }],
     Student: [
       { name: "Grades", link: "grades.html" },
       { name: "Attendance", link: "attendance.html" },
       { name: "Vote", link: "vote.html" },
     ],
-    Moderator: [
-      { name: "Record Book", link: "recordbook.html" },
-    ],
+    Moderator: [{ name: "Record Book", link: "recordbook.html" }],
     Registrar: [
       { name: "Enrollee", link: "registrar.html" },
       { name: "Enrolled", link: "enrolled.html" },
@@ -31,9 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     SuperAdmin: [
       { name: "Principal (Full Access)", link: "principal.html" },
     ],
-    SSG: [
-      { name: "SSG Management", link: "ssg.html" },
-    ],
+    SSG: [{ name: "SSG Management", link: "ssg.html" }],
   };
 
   // Start with base User menu
@@ -44,15 +37,26 @@ document.addEventListener("DOMContentLoaded", () => {
     finalMenu = [...finalMenu, ...menus[role]];
   }
 
-  // Special role: SSG can stack on Student or Moderator
-  if (user.isSSG) {
+  // Allow stacking extraRoles (new!)
+  if (user.extraRoles && Array.isArray(user.extraRoles)) {
+    user.extraRoles.forEach(r => {
+      if (menus[r]) finalMenu.push(...menus[r]);
+    });
+  }
+
+  // Special case: SSG (flag or role)
+  if (user.isSSG || role === "SSG") {
     finalMenu.push(...menus.SSG);
   }
 
-  // Inject menu items
+  // Inject menu items with smooth styling
   finalMenu.forEach(item => {
     const li = document.createElement("li");
-    li.innerHTML = `<a href="${item.link}">${item.name}</a>`;
+    const a = document.createElement("a");
+    a.href = item.link;
+    a.textContent = item.name;
+    a.classList.add("menu-link");
+    li.appendChild(a);
     menuList.appendChild(li);
   });
 });
