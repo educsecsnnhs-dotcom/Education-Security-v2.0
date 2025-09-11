@@ -15,12 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const fullName = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = passwordInput.value.trim();
 
-      if (!fullName || !email || !password) {
-        alert("⚠️ All fields are required");
+      if (!email || !password) {
+        alert("⚠️ Email and password are required");
         return;
       }
 
@@ -28,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fullName, email, password }),
+          body: JSON.stringify({ email, password }),
         });
 
         const data = await res.json();
@@ -37,10 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        alert("✅ Registered successfully! Please log in.");
+        alert("✅ Registration successful!");
         window.location.href = "login.html";
       } catch (err) {
-        console.error("Register error:", err);
+        console.error("Registration error:", err);
         alert("❌ Network error. Try again.");
       }
     });
