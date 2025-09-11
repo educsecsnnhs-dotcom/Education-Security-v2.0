@@ -360,3 +360,67 @@ main {
   border-radius: 8px;
   margin-bottom: 2rem;
 }
+
+
+/* Splash Screen Styles */
+.splash-body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f7fb url("images/school-logo.png") no-repeat center center fixed;
+  background-size: 300px 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.splash-container {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.splash-logo {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+}
+
+.splash-container h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #1d3557;
+}
+
+.splash-container .highlight {
+  color: #e63946;
+  font-weight: bold;
+}
+
+.redirect-text {
+  margin: 1rem 0;
+  color: #555;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1d3557;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
