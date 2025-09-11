@@ -3,15 +3,18 @@ const User = require("../models/User");
 const { encryptPassword } = require("../utils/caesar");
 
 /**
- * Register a new user
+ * Register a new user (email + password only)
  */
 exports.register = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    let { email, password } = req.body;
 
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
+
+    // Normalize email to lowercase
+    email = email.toLowerCase();
 
     const existing = await User.findOne({ email });
     if (existing) {
@@ -22,7 +25,6 @@ exports.register = async (req, res) => {
     const encryptedPassword = encryptPassword(password);
 
     const user = new User({
-      fullName,
       email,
       password: encryptedPassword,
       role: "User",
@@ -31,7 +33,7 @@ exports.register = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ message: "✅ Registration successful" });
   } catch (err) {
     console.error("❌ Register error:", err);
     res.status(500).json({ message: "Error registering user" });
@@ -39,15 +41,18 @@ exports.register = async (req, res) => {
 };
 
 /**
- * Login user
+ * Login user (email + password only)
  */
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
+
+    // Normalize email to lowercase
+    email = email.toLowerCase();
 
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -62,7 +67,6 @@ exports.login = async (req, res) => {
       message: "Login successful",
       user: {
         id: user._id,
-        fullName: user.fullName,
         email: user.email,
         role: user.role,
         extraRoles: user.extraRoles,
