@@ -6,28 +6,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const role = user.role;
 
   // Menu definitions
-  const menus = {
-    User: [{ name: "Enrollment", link: "enrollment.html" }],
-    Student: [
-      { name: "Grades", link: "grades.html" },
-      { name: "Attendance", link: "attendance.html" },
-      { name: "Vote", link: "vote.html" },
-    ],
-    Moderator: [{ name: "Record Book", link: "recordbook.html" }],
-    Registrar: [
-      { name: "Enrollee", link: "registrar.html" },
-      { name: "Enrolled", link: "enrolled.html" },
-      { name: "Archives", link: "archives.html" },
-    ],
-    Admin: [
-      { name: "Management", link: "admin.html" },
-      { name: "Announcements", link: "announcements.html" },
-    ],
-    SuperAdmin: [
-      { name: "Principal (Full Access)", link: "principal.html" },
-    ],
-    SSG: [{ name: "SSG Management", link: "ssg.html" }],
-  };
+const menus = {
+  User: [{ name: "Enrollment", link: "pages/enrollment.html" }],
+  Student: [
+    { name: "Grades", link: "pages/grades.html" },
+    { name: "Attendance", link: "pages/attendance.html" },
+    { name: "Vote", link: "pages/vote.html" },
+  ],
+  Moderator: [{ name: "Record Book", link: "pages/recordbook.html" }],
+  Registrar: [
+    { name: "Enrollee", link: "pages/registrar.html" },
+    { name: "Enrolled", link: "pages/enrolled.html" },
+    { name: "Archives", link: "pages/archives.html" },
+  ],
+  Admin: [
+    { name: "Management", link: "pages/admin.html" },
+    { name: "Announcements", link: "pages/announcements.html" },
+  ],
+  SuperAdmin: [
+    { name: "Principal (Full Access)", link: "pages/principal.html" },
+  ],
+  SSG: [{ name: "SSG Management", link: "pages/ssg.html" }],
+};
+
 
   // Start with base User menu
   let finalMenu = [...menus.User];
