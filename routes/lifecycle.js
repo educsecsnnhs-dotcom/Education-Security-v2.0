@@ -3,8 +3,10 @@ const multer = require("multer");
 const path = require("path");
 const express = require("express");
 const router = express.Router();
+
 const lifecycleController = require("../controllers/lifecycleController");
 const { authRequired } = require("../controllers/authController");
+const Enrollment = require("../models/Enrollment"); // ✅ Needed for archived route
 
 // Storage setup
 const storage = multer.diskStorage({
@@ -29,7 +31,24 @@ function fileFilter(req, file, cb) {
 
 const upload = multer({ storage, fileFilter });
 
-// Student submits enrollment with documents
+// 📂 Fetch archived students (Registrar & SuperAdmin only)
+router.get("/enrollment/archived", authRequired, async (req, res) => {
+  try {
+    const students = await Enrollment.find({ archived: true });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching archived students", error: err.message });
+  }
+});
+
+// ♻ Restore archived student
+router.post(
+  "/enrollment/:id/restore",
+  authRequired,
+  lifecycleController.restoreStudent
+);
+
+// 📝 Student submits enrollment with documents
 router.post(
   "/enroll",
   authRequired, // must be logged in
