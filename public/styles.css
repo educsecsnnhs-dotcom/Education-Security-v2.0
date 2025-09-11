@@ -923,3 +923,122 @@ main {
 .attendance .excused:hover {
   background: #c05621;
 }
+
+/* =======================
+   📊 Student Grades Page
+   ======================= */
+
+.container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 15px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Student Info */
+.student-info p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+/* Tables */
+.grades-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.grades-section th,
+.grades-section td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.grades-section th {
+  background: #f7f7f7;
+  font-weight: bold;
+}
+
+.grades-section tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Expandable details */
+.expandable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.expandable:hover {
+  background: #f1f9ff;
+}
+.details-row {
+  display: none;
+  background: #f9f9f9;
+}
+.details-row td {
+  text-align: left;
+  font-size: 0.9rem;
+  padding: 12px;
+}
+
+/* Pass/Fail Coloring */
+td.pass {
+  color: #2e7d32;
+  font-weight: bold;
+}
+td.fail {
+  color: #c62828;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .grades-section table,
+  .grades-section thead,
+  .grades-section tbody,
+  .grades-section th,
+  .grades-section td,
+  .grades-section tr {
+    display: block;
+  }
+
+  .grades-section tr {
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+
+  .grades-section td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .grades-section td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .grades-section th {
+    display: none;
+  }
+}
