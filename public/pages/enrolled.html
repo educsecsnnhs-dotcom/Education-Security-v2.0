@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Enrolled Students</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="js/auth.js"></script>
-  <script defer src="js/script.js"></script>
-  <script defer src="js/enrolled.js"></script>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/script.js"></script>
+  <script defer src="../js/enrolled.js"></script>
 </head>
 <body>
   <header>
-    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <button onclick="window.location.href='../welcome.html'" class="back-btn">⬅ Back</button>
     <h1>📘 Enrolled Students</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
   <main>
-    <section>
-      <h2>🔍 Filters</h2>
-      <label>
-        Grade Level:
+    <!-- Filters -->
+    <section class="card filter-card">
+      <h2>🔍 Search & Filters</h2>
+      <div class="filters">
+        <input type="text" id="searchName" placeholder="Search by name or LRN...">
         <select id="filterGrade">
-          <option value="">All</option>
+          <option value="">All Grades</option>
           <option value="7">Grade 7</option>
           <option value="8">Grade 8</option>
           <option value="9">Grade 9</option>
@@ -29,30 +30,57 @@
           <option value="11">Grade 11</option>
           <option value="12">Grade 12</option>
         </select>
-      </label>
-
-      <label>
-        Strand/Section:
-        <input type="text" id="filterSection" placeholder="e.g. STEM A">
-      </label>
-
-      <button id="applyFilters">Apply</button>
+        <input type="text" id="filterSection" placeholder="Strand/Section e.g. STEM A">
+        <button id="applyFilters" class="btn-submit">Apply</button>
+      </div>
     </section>
 
-    <section>
+    <!-- Student List -->
+    <section class="card list-card">
       <h2>📋 Student List</h2>
-      <table border="1">
+      <table class="styled-table">
         <thead>
           <tr>
             <th>LRN</th>
             <th>Name</th>
             <th>Grade</th>
+            <th>Strand</th>
             <th>Section</th>
+            <th>Status</th>
           </tr>
         </thead>
-        <tbody id="enrolledTable"></tbody>
+        <tbody id="enrolledTable">
+          <!-- Populated dynamically -->
+        </tbody>
       </table>
     </section>
+
+    <!-- Student Details Modal -->
+    <div id="studentModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2 id="studentName">👤 Student Details</h2>
+        
+        <!-- Tab Menu -->
+        <div class="tab-menu">
+          <button class="tab-btn active" data-tab="info">📖 Info</button>
+          <button class="tab-btn" data-tab="docs">📂 Documents</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="tab-info">
+          <p><strong>LRN:</strong> <span id="detailLrn"></span></p>
+          <p><strong>Grade Level:</strong> <span id="detailGrade"></span></p>
+          <p><strong>Strand:</strong> <span id="detailStrand"></span></p>
+          <p><strong>Section:</strong> <span id="detailSection"></span></p>
+          <p><strong>School Year:</strong> <span id="detailYear"></span></p>
+        </div>
+
+        <div class="tab-content hidden" id="tab-docs">
+          <ul id="detailDocs"></ul>
+        </div>
+      </div>
+    </div>
   </main>
 </body>
 </html>
