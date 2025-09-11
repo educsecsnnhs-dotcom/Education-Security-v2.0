@@ -54,10 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
-      Auth.logout(); // ✅ now using auth.js
+      Auth.logout();
     });
   }
-
-  // ✅ Ensure login required for welcome page
-  Auth.requireLogin();
 });
