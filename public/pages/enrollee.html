@@ -10,7 +10,7 @@
 <body>
   <header>
     <button onclick="window.location.href='../welcome.html'" class="back-btn">⬅ Back</button>
-    <h1>📝 Pending Enrollees</h1>
+    <h1>Registrar Dashboard</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
@@ -18,14 +18,26 @@
     <!-- 🔍 Filters -->
     <section class="card">
       <h2>🔍 Search & Filters</h2>
-      <input type="text" id="searchName" placeholder="Search by name...">
-      <select id="filterLevel">
-        <option value="">All Levels</option>
-        <option value="junior">Junior High</option>
-        <option value="senior">Senior High</option>
-      </select>
-      <input type="text" id="filterStrand" placeholder="Filter by strand (e.g. STEM)">
-      <button id="applyFilters">Apply</button>
+      <div class="filters">
+        <input type="text" id="searchName" placeholder="Search by name...">
+        <select id="filterLevel">
+          <option value="">All Levels</option>
+          <option value="junior">Junior High</option>
+          <option value="senior">Senior High</option>
+        </select>
+        <input type="text" id="filterStrand" placeholder="Filter by strand (e.g. STEM)">
+        <button id="applyFilters">Apply</button>
+      </div>
+    </section>
+
+    <!-- 📊 Quick Stats -->
+    <section class="card">
+      <h2>📊 Enrollment Stats</h2>
+      <div id="statsBox">
+        <p><b>Total Pending:</b> <span id="statTotal">0</span></p>
+        <p><b>Junior High:</b> <span id="statJunior">0</span></p>
+        <p><b>Senior High:</b> <span id="statSenior">0</span></p>
+      </div>
     </section>
 
     <!-- 📝 Enrollment Requests -->
