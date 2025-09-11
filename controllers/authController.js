@@ -46,13 +46,17 @@ exports.register = async (req, res) => {
 
 /**
  * Login user
- * Password is checked via Caesar decryption
+ * Accepts either email or fullName
  */
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
-    const user = await User.findOne({ email });
+    // Find by email OR fullName
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { fullName: emailOrUsername }],
+    });
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const decrypted = decryptPassword(user.password);
