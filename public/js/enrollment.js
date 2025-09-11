@@ -33,23 +33,25 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Collect form data including files
     const formData = new FormData(form);
     formData.append("userId", user._id);
 
     try {
       const res = await fetch("/api/lifecycle/enroll", {
         method: "POST",
-        body: formData, // send directly, browser sets headers
+        body: formData, // ✅ FormData automatically sets multipart headers
       });
 
-      if (!res.ok) throw new Error("Enrollment failed");
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Enrollment failed");
+      }
 
       alert("✅ Enrollment submitted successfully! Please wait for registrar approval.");
-      window.location.href = "../welcome.html"; // remember it's in /public/
+      window.location.href = "../welcome.html"; // back to main menu
     } catch (err) {
       alert("❌ Enrollment failed. Please try again.");
-      console.error(err);
+      console.error("Enrollment error:", err);
     }
   });
 });
