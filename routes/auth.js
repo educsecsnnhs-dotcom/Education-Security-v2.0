@@ -1,13 +1,108 @@
+// routes/auth.js
 const express = require("express");
+const User = require("../models/User");
+const { encryptPassword } = require("../utils/caesar");
+
 const router = express.Router();
-const { register, login, assignRole } = require("../controllers/authController");
-const { authRequired, requireRole } = require("../middleware/authMiddleware");
 
-// Public
-router.post("/register", register);
-router.post("/login", login);
+/**
+ * @route   POST /api/auth/register
+ * @desc    Register a new user (password encrypted with Caesar cipher)
+ */
+router.post("/register", async (req, res) => {
+  try {
+    const { fullName, email, password, role } = req.body;
 
-// Only SuperAdmin can assign Registrar/Admin roles
-router.post("/assign-role", authRequired, assignRole);
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Encrypt password with Caesar
+    const encryptedPassword = encryptPassword(password);
+
+    const user = new User({
+      fullName,
+      email,
+      password: encryptedPassword,
+      role: role || "User",   // default role
+      extraRoles: []          // optional roles
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      message: "✅ User registered successfully",
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        extraRoles: user.extraRoles,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Register error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/**
+ * @route   POST /api/auth/login
+ * @desc    Login user (compare Caesar-encrypted passwords)
+ */
+router.post("/login", async (req, res) => {
+  try {
+    const { emailOrUsername, password } = req.body;
+
+    if (!emailOrUsername || !password) {
+      return res.status(400).json({ message: "Email/Username and password are required" });
+    }
+
+    // Find user by email or fullName
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { fullName: emailOrUsername }],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Encrypt entered password with Caesar cipher
+    const encryptedInput = encryptPassword(password);
+
+    // Compare with DB
+    if (encryptedInput !== user.password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Success
+    res.json({
+      message: "✅ Login successful",
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        extraRoles: user.extraRoles,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Simple logout
+ */
+router.post("/logout", (req, res) => {
+  res.json({ message: "✅ Logged out successfully" });
+});
 
 module.exports = router;
