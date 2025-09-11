@@ -32,7 +32,9 @@ app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/announcements", require("./routes/announcement"));
 app.use("/api/attendance", require("./routes/attendance"));
-app.use("/api/sections", require("./routes/section")); // ✅ New Section routes
+app.use("/api/sections", require("./routes/section")); 
+app.use("/api/announcements", require("./routes/announcements"));
+
 
 // Serve frontend from "public"
 app.use(express.static(path.join(__dirname, "public")));
