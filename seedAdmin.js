@@ -11,8 +11,8 @@ async function seedSuperAdmin() {
     });
 
     const email = "superadmin@school.com";
-    const password = "superadmin123"; 
-    const role = "SuperAdmin";        
+    const password = "superadmin123"; // plain (Caesar will handle comparison on login)
+    const role = "SuperAdmin";
 
     // Check if SuperAdmin already exists
     let user = await User.findOne({ email });
@@ -38,6 +38,13 @@ async function seedSuperAdmin() {
       email: user.email,
       role: user.role,
     });
-    process.exit();
+
+    await mongoose.disconnect();
+    process.exit(0);
   } catch (err) {
     console.error("❌ Error seeding SuperAdmin:", err);
+    process.exit(1);
+  }
+}
+
+seedSuperAdmin();
