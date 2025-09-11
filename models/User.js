@@ -1,6 +1,5 @@
 // models/User.js
 const mongoose = require("mongoose");
-const { encryptPassword } = require("../utils/caesar");
 
 const ROLES = [
   "User",       // default new account
@@ -14,8 +13,7 @@ const ROLES = [
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true }, // stored encrypted via Caesar
     role: {
       type: String,
@@ -23,16 +21,8 @@ const userSchema = new mongoose.Schema(
       default: "User"
     },
     extraRoles: [{ type: String }], // e.g. ["SSG"] if given
-    lrn: { type: String, unique: true, sparse: true }, // Learner Reference Number (optional at register, used in enrollment)
   },
   { timestamps: true }
 );
-
-// Middleware: Encrypt password before save
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = encryptPassword(this.password);
-  next();
-});
 
 module.exports = mongoose.model("User", userSchema);
