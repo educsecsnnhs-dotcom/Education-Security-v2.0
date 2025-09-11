@@ -15,17 +15,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   const filterStrand = document.getElementById("filterStrand");
   const applyFiltersBtn = document.getElementById("applyFilters");
 
+  const statTotal = document.getElementById("statTotal");
+  const statJunior = document.getElementById("statJunior");
+  const statSenior = document.getElementById("statSenior");
+
   let allEnrollees = [];
 
   async function loadEnrollees() {
     try {
       const enrollees = await apiFetch("/api/enrollment/pending");
       allEnrollees = enrollees;
+      updateStats(enrollees);
       renderEnrollees(enrollees);
     } catch (err) {
       console.error("Failed to load enrollees:", err);
       enrolleeList.innerHTML = "<p>⚠ Failed to load pending enrollees.</p>";
     }
+  }
+
+  function updateStats(list) {
+    statTotal.textContent = list.length;
+    statJunior.textContent = list.filter((e) => e.level === "junior").length;
+    statSenior.textContent = list.filter((e) => e.level === "senior").length;
   }
 
   function renderEnrollees(list) {
@@ -111,6 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return matchesName && matchesLevel && matchesStrand;
     });
 
+    updateStats(filtered);
     renderEnrollees(filtered);
   }
 
@@ -120,15 +132,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   enrolleeList.addEventListener("click", async (e) => {
     if (e.target.classList.contains("approve-btn")) {
       const id = e.target.dataset.id;
-      await apiFetch(`/api/enrollment/${id}/approve`, { method: "POST" });
-      alert("✅ Enrollee approved");
-      loadEnrollees();
+      if (confirm("✅ Approve this enrollee?")) {
+        await apiFetch(`/api/enrollment/${id}/approve`, { method: "POST" });
+        loadEnrollees();
+      }
     }
     if (e.target.classList.contains("reject-btn")) {
       const id = e.target.dataset.id;
-      await apiFetch(`/api/enrollment/${id}/reject`, { method: "POST" });
-      alert("❌ Enrollee rejected");
-      loadEnrollees();
+      if (confirm("❌ Reject this enrollee?")) {
+        await apiFetch(`/api/enrollment/${id}/reject`, { method: "POST" });
+        loadEnrollees();
+      }
     }
   });
 
