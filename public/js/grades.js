@@ -83,7 +83,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${subj.subject}</td>
-          <td>${subj.finalGrade || "-"}</td>
+          <td class="${subj.finalGrade >= 75 ? "pass" : "fail"}">
+            ${subj.finalGrade || "-"}
+          </td>
           <td>${remarks}</td>
         `;
         officialBody.appendChild(tr);
