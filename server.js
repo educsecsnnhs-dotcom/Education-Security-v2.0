@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const path = require("path");
 
@@ -12,7 +11,7 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json()); // replaces body-parser
 app.use(morgan("dev"));
 
 // MongoDB connection
@@ -30,7 +29,6 @@ app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/announcements", require("./routes/announcement"));
 app.use("/api/attendance", require("./routes/attendance"));
-
 
 // Serve frontend from "public"
 app.use(express.static(path.join(__dirname, "public")));
