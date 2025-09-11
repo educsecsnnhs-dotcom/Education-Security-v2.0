@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
     Moderator: [
-      { name: "Record Book", link: "pages/recordbook.html", icon: "📚" }
+      { name: "Record Book", link: "pages/recordbook.html", icon: "📚" },
       { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
     Registrar: [
@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
     SuperAdmin: [], 
     SSG: [
-      { name: "SSG Management", link: "pages/ssg.html", icon: "🏛️" }
+      { name: "SSG Management", link: "pages/ssg.html", icon: "🏛️" },
+      { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
   };
 
