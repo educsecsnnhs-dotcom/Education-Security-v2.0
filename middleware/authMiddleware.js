@@ -1,11 +1,45 @@
 /**
+ * Role Normalization Map
+ */
+const roleMap = {
+  user: "User",
+  users: "User",
+  student: "Student",
+  students: "Student",
+  moderator: "Moderator",
+  moderators: "Moderator",
+  registrar: "Registrar",
+  registrars: "Registrar",
+  admin: "Admin",
+  admins: "Admin",
+  superadmin: "SuperAdmin",
+  ssg: "SSG",
+};
+
+/**
+ * Normalize a role string
+ */
+const normalizeRole = (role) => {
+  if (!role) return role;
+  const key = role.toLowerCase();
+  return roleMap[key] || role;
+};
+
+/**
  * Ensure user is authenticated
  */
 const authRequired = (req, res, next) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "Not logged in" });
   }
-  req.user = req.session.user; // attach session user
+  req.user = req.session.user;
+
+  // ✅ Normalize main role + extra roles
+  req.user.role = normalizeRole(req.user.role);
+  if (Array.isArray(req.user.extraRoles)) {
+    req.user.extraRoles = req.user.extraRoles.map(normalizeRole);
+  }
+
   next();
 };
 
@@ -18,7 +52,7 @@ const requireRole = (role) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { role: userRole, extraRoles = [] } = req.session.user;
+    const { role: userRole, extraRoles = [] } = req.user;
 
     // ✅ SuperAdmin bypass
     if (userRole === "SuperAdmin") {
@@ -42,7 +76,7 @@ const requireAnyRole = (roles = []) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { role: userRole, extraRoles = [] } = req.session.user;
+    const { role: userRole, extraRoles = [] } = req.user;
 
     // ✅ SuperAdmin bypass
     if (userRole === "SuperAdmin") {
