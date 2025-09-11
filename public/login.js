@@ -1,38 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
+  const togglePassword = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("password");
 
+  // 👁️ Toggle password visibility
+  if (togglePassword) {
+    togglePassword.addEventListener("click", () => {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      togglePassword.textContent = type === "password" ? "👁️" : "🙈";
+    });
+  }
+
+  // 📌 Form submit
   form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // ✅ stop page refresh
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const emailOrUsername = document.getElementById("username").value.trim();
+    const password = passwordInput.value.trim();
 
     try {
+      // send to backend
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email: emailOrUsername, // backend expects "email"
+          password,
+        }),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
-        // ✅ Save user info locally for session
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        // (optional) Save token if your backend returns one
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-
-        // Redirect to dashboard
-        window.location.href = "welcome.html";
-      } else {
-        alert(data.message || "Login failed");
+      if (!res.ok) {
+        alert("❌ " + (data.message || "Login failed"));
+        return;
       }
+
+      // Save user to localStorage
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      alert("✅ Login successful!");
+      window.location.href = "welcome.html"; // redirect
     } catch (err) {
       console.error("Login error:", err);
-      alert("Something went wrong. Please try again.");
+      alert("❌ Network error. Please try again.");
     }
   });
 });
