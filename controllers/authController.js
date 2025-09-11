@@ -1,6 +1,6 @@
 // controllers/authController.js
 const User = require("../models/User");
-const { decryptPassword, encryptPassword } = require("../utils/caesar");
+const { encryptPassword, decryptPassword } = require("../utils/caesar");
 
 /**
  * Register a new user
@@ -9,6 +9,10 @@ const { decryptPassword, encryptPassword } = require("../utils/caesar");
 exports.register = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
+
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "fullName, email and password are required" });
+    }
 
     const existing = await User.findOne({ email });
     if (existing) {
@@ -46,24 +50,32 @@ exports.register = async (req, res) => {
 
 /**
  * Login user
- * Accepts either email or fullName
+ * Accepts either email or fullName (username)
+ * Compares by encrypting the input password (so both are same format)
  */
 exports.login = async (req, res) => {
   try {
     const { emailOrUsername, password } = req.body;
 
-    // Find by email OR fullName
+    if (!emailOrUsername || !password) {
+      return res.status(400).json({ message: "emailOrUsername and password are required" });
+    }
+
+    // Find user by email OR fullName
     const user = await User.findOne({
       $or: [{ email: emailOrUsername }, { fullName: emailOrUsername }],
     });
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const decrypted = decryptPassword(user.password);
-    if (decrypted !== password) {
+    // Encrypt input password same as registration uses, then compare
+    const encryptedInput = encryptPassword(password);
+
+    if (encryptedInput !== user.password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Successful login -> return minimal user info
     res.json({
       message: "Login successful",
       user: {
