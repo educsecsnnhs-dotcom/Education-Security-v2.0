@@ -20,6 +20,11 @@ const requireRole = (role) => {
 
     const { role: userRole, extraRoles = [] } = req.session.user;
 
+    // ✅ SuperAdmin bypass
+    if (userRole === "SuperAdmin") {
+      return next();
+    }
+
     if (userRole !== role && !extraRoles.includes(role)) {
       return res.status(403).json({ message: `Requires role: ${role}` });
     }
@@ -38,6 +43,11 @@ const requireAnyRole = (roles = []) => {
     }
 
     const { role: userRole, extraRoles = [] } = req.session.user;
+
+    // ✅ SuperAdmin bypass
+    if (userRole === "SuperAdmin") {
+      return next();
+    }
 
     if (![userRole, ...extraRoles].some((r) => roles.includes(r))) {
       return res
