@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Enrollment - AGRITECH</title>
+  <title>Enrollment - SNNHS</title>
   <link rel="stylesheet" href="../styles.css">
   <script defer src="../js/auth.js"></script>
   <script defer src="../js/script.js"></script>
@@ -10,42 +10,52 @@
 </head>
 <body>
   <header>
-    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
+    <button onclick="window.location.href='public/welcome.html'" class="back-btn">⬅ Back</button>
     <h1>Enrollment Form</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
   <main>
-    <form id="enrollmentForm">
-      <!-- Student Info -->
-      <h2>Student Information</h2>
-      <label>Full Name:</label>
-      <input type="text" name="name" required>
+    <section class="card form-card">
+      <form id="enrollmentForm">
+        <!-- Student Info -->
+        <h2>👤 Student Information</h2>
+        <div class="form-group">
+          <label>Full Name:</label>
+          <input type="text" name="name" placeholder="Juan Dela Cruz" required>
+        </div>
 
-      <label>LRN (Learner Reference Number):</label>
-      <input type="text" name="lrn" required maxlength="12">
+        <div class="form-group">
+          <label>LRN (Learner Reference Number):</label>
+          <input type="text" name="lrn" pattern="\\d{12}" maxlength="12" placeholder="12-digit LRN" required>
+        </div>
 
-      <label>Grade Level:</label>
-      <select name="level" id="levelSelect" required>
-        <option value="">-- Select --</option>
-        <option value="junior">Junior High</option>
-        <option value="senior">Senior High</option>
-      </select>
+        <div class="form-group">
+          <label>Grade Level:</label>
+          <select name="level" id="levelSelect" required>
+            <option value="">-- Select --</option>
+            <option value="junior">Junior High</option>
+            <option value="senior">Senior High</option>
+          </select>
+        </div>
 
-      <!-- Dynamic Strand -->
-      <div id="strandSection" style="display:none;">
-        <label>Strand:</label>
-        <select name="strand" id="strandSelect"></select>
-      </div>
+        <!-- Dynamic Strand -->
+        <div id="strandSection" class="form-group" style="display:none;">
+          <label>Strand:</label>
+          <select name="strand" id="strandSelect" required></select>
+        </div>
 
-      <label>School Year:</label>
-      <select name="schoolYear" required>
-        <option value="2024-2025">2024-2025</option>
-        <option value="2025-2026">2025-2026</option>
-      </select>
+        <div class="form-group">
+          <label>School Year:</label>
+          <select name="schoolYear" required>
+            <option value="2024-2025">2024-2025</option>
+            <option value="2025-2026">2025-2026</option>
+          </select>
+        </div>
 
-      <button type="submit">Submit Enrollment</button>
-    </form>
+        <button type="submit" class="btn-submit">📨 Submit Enrollment</button>
+      </form>
+    </section>
   </main>
 </body>
 </html>
