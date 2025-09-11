@@ -49,6 +49,22 @@ router.post("/promote/registrar", authRequired, requireRole("Registrar"), async 
 });
 
 /**
+ * @route   GET /api/auth/users
+ * @desc    List all users (for role management)
+ * @access  SuperAdmin or Registrar
+ */
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json({ users });
+  } catch (err) {
+    console.error("❌ Fetch users error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+/**
  * Registrar → assign/remove SSG role (extraRoles array)
  */
 router.post("/ssg/toggle", authRequired, requireRole("Registrar"), async (req, res) => {
