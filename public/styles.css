@@ -12,6 +12,9 @@ body {
   height: 100vh;
 }
 
+/* -----------------------
+   Header
+------------------------ */
 header {
   display: flex;
   justify-content: center;
@@ -30,47 +33,67 @@ header .logout {
   border: none;
   padding: 6px 12px;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+header .logout:hover {
+  background: #b22222;
 }
 
 .title {
   font-size: 1.5rem;
 }
 
+/* -----------------------
+   Sidebar
+------------------------ */
 .sidebar {
   position: fixed;
   top: 50px;
   left: 0;
-  width: 60px;
+  width: 220px;
   height: 100%;
   background: #333;
-  overflow-x: hidden;
-  transition: width 0.2s ease;
-}
-
-.sidebar:hover {
-  width: 200px;
+  padding-top: 10px;
+  overflow-y: auto;
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar li {
-  padding: 12px;
+  margin: 4px 0;
 }
 
 .sidebar a {
-  color: white;
+  color: #dfe6e9;
   text-decoration: none;
   display: block;
+  padding: 10px 16px;
+  border-radius: 4px;
+  transition: background 0.3s, color 0.3s;
 }
 
+.sidebar a:hover,
+.sidebar a.active {
+  background: #0984e3;
+  color: #fff;
+}
+
+/* -----------------------
+   Main Layout
+------------------------ */
 main {
-  margin-left: 60px;
+  margin-left: 240px; /* match sidebar width */
+  margin-top: 60px;   /* match header height */
   padding: 20px;
   flex: 1;
   overflow-y: auto;
+  background: #f5f6fa;
 }
 
 /* -----------------------
@@ -163,4 +186,27 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+/* -----------------------
+   Welcome Page Cards
+------------------------ */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  margin-top: 0;
+  color: #003366;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.card h2 span {
+  margin-right: 10px;
 }
