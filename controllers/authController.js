@@ -1,10 +1,10 @@
 // controllers/authController.js
 const User = require("../models/User");
-const { decryptPassword, encryptPassword } = require("../utils/caesar");
+const { encryptPassword } = require("../utils/caesar");
 
 /**
  * Register a new user
- * Every new account starts with role: "User"
+ * Encrypt plain password, save to DB
  */
 exports.register = async (req, res) => {
   try {
@@ -15,15 +15,14 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Encrypt password before saving
     const encryptedPassword = encryptPassword(password);
 
     const user = new User({
       fullName,
       email,
       password: encryptedPassword,
-      role: "User",      // default role
-      extraRoles: [],    // default empty
+      role: "User",
+      extraRoles: [],
     });
 
     await user.save();
@@ -46,7 +45,7 @@ exports.register = async (req, res) => {
 
 /**
  * Login user
- * Password is checked via Caesar decryption
+ * Encrypt plain password from user, compare with DB
  */
 exports.login = async (req, res) => {
   try {
@@ -56,15 +55,17 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "emailOrUsername and password are required" });
     }
 
-    // Find by either email or fullName
+    // Match by email OR fullName
     const user = await User.findOne({
       $or: [{ email: emailOrUsername }, { fullName: emailOrUsername }]
     });
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const decrypted = decryptPassword(user.password);
-    if (decrypted !== password) {
+    // Encrypt input password (not decrypt DB password!)
+    const encryptedInput = encryptPassword(password);
+
+    if (encryptedInput !== user.password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -90,9 +91,8 @@ exports.login = async (req, res) => {
 exports.assignRole = async (req, res) => {
   try {
     const { userId, role } = req.body;
-    const actingUser = req.user; // from middleware
+    const actingUser = req.user;
 
-    // Check permissions
     if (["Student", "Moderator", "SSG"].includes(role)) {
       if (actingUser.role !== "Registrar" && actingUser.role !== "SuperAdmin") {
         return res.status(403).json({ message: "Only Registrar or SuperAdmin can assign this role" });
@@ -122,9 +122,6 @@ exports.assignRole = async (req, res) => {
   }
 };
 
-/**
- * Simple logout
- */
 exports.logout = async (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
