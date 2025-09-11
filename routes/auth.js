@@ -1,7 +1,6 @@
-// routes/auth.js
 const express = require("express");
 const User = require("../models/User");
-const { encryptPassword } = require("../utils/caesar");
+const { encryptPassword, comparePassword } = require("../utils/caesar");
 
 const router = express.Router();
 
@@ -66,11 +65,8 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Encrypt entered password with Caesar cipher
-    const encryptedInput = encryptPassword(password);
-
-    // Compare with DB
-    if (encryptedInput !== user.password) {
+    // Compare input with stored password
+    if (!comparePassword(password, user.password)) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
