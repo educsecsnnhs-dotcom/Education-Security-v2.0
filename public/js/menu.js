@@ -5,75 +5,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const role = user.role;
 
-  // Menu definitions
+  // Menu definitions with icons
   const menus = {
-    User: [{ name: "Enrollment", link: "pages/enrollment.html" }],
+    User: [{ name: "Enrollment", link: "pages/enrollment.html", icon: "📝" }],
     Student: [
-      { name: "Grades", link: "pages/grades.html" },
-      { name: "Attendance", link: "pages/attendance.html" },
-      { name: "Vote", link: "pages/vote.html" },
+      { name: "Grades", link: "pages/grades.html", icon: "📊" },
+      { name: "Attendance", link: "pages/attendance.html", icon: "🕒" },
+      { name: "Vote", link: "pages/vote.html", icon: "🗳️" },
     ],
-    Moderator: [{ name: "Record Book", link: "pages/recordbook.html" }],
+    Moderator: [{ name: "Record Book", link: "pages/recordbook.html", icon: "📚" }],
     Registrar: [
-      { name: "Enrollee", link: "pages/registrar.html" },
-      { name: "Enrolled", link: "pages/enrolled.html" },
-      { name: "Archives", link: "pages/archives.html" },
+      { name: "Enrollee", link: "pages/registrar.html", icon: "🧾" },
+      { name: "Enrolled", link: "pages/enrolled.html", icon: "✅" },
+      { name: "Archives", link: "pages/archives.html", icon: "📂" },
     ],
     Admin: [
-      { name: "Management", link: "pages/admin.html" },
-      { name: "Announcements", link: "pages/announcements.html" },
+      { name: "Management", link: "pages/admin.html", icon: "⚙️" },
+      { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
-    SSG: [{ name: "SSG Management", link: "pages/ssg.html" }],
-    SuperAdmin: [
-      { name: "Role Management", link: "pages/role-management.html" }, // new
-    ],
+    SuperAdmin: [], // Will see everything (we merge later)
+    SSG: [{ name: "SSG Management", link: "pages/ssg.html", icon: "🏛️" }],
   };
 
-  let finalMenu = [];
+  // Start with base User menu
+  let finalMenu = [...menus.User];
 
+  // Merge role menus
   if (role === "SuperAdmin") {
-    // SuperAdmin = full access: merge ALL menus
-    Object.values(menus).forEach(arr => {
-      finalMenu.push(...arr);
+    // SuperAdmin gets ALL menus (except duplicates)
+    Object.keys(menus).forEach(r => {
+      if (r !== "SuperAdmin") finalMenu.push(...menus[r]);
     });
-  } else {
-    // Start with base User menu
-    finalMenu = [...menus.User];
+  } else if (menus[role]) {
+    finalMenu = [...finalMenu, ...menus[role]];
+  }
 
-    // Merge role menus
-    if (menus[role]) {
-      finalMenu = [...finalMenu, ...menus[role]];
-    }
+  // Allow stacking extraRoles
+  if (user.extraRoles && Array.isArray(user.extraRoles)) {
+    user.extraRoles.forEach(r => {
+      if (menus[r]) finalMenu.push(...menus[r]);
+    });
+  }
 
-    // Allow stacking extraRoles
-    if (user.extraRoles && Array.isArray(user.extraRoles)) {
-      user.extraRoles.forEach(r => {
-        if (menus[r]) finalMenu.push(...menus[r]);
-      });
-    }
-
-    // Special case: SSG (flag or role)
-    if (user.isSSG || role === "SSG") {
-      finalMenu.push(...menus.SSG);
-    }
+  // Special case: SSG
+  if (user.isSSG || role === "SSG") {
+    finalMenu.push(...menus.SSG);
   }
 
   // Remove duplicates (by name)
-  const uniqueMenu = [];
   const seen = new Set();
-  finalMenu.forEach(item => {
-    if (!seen.has(item.name)) {
-      seen.add(item.name);
-      uniqueMenu.push(item);
-    }
+  finalMenu = finalMenu.filter(item => {
+    if (seen.has(item.name)) return false;
+    seen.add(item.name);
+    return true;
   });
 
   // Inject menu items
-  uniqueMenu.forEach(item => {
+  finalMenu.forEach(item => {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.href = item.link;
-    a.textContent = item.name;
+    a.innerHTML = `<span class="icon">${item.icon || "📄"}</span><span class="label">${item.name}</span>`;
     a.classList.add("menu-link");
     li.appendChild(a);
     menuList.appendChild(li);
