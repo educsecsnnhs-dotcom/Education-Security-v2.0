@@ -15,11 +15,31 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    const user = new User({ fullName, email, password });
+    // Encrypt password before saving
+    const encryptedPassword = encryptPassword(password);
+
+    const user = new User({
+      fullName,
+      email,
+      password: encryptedPassword,
+      role: "User",      // default role
+      extraRoles: [],    // default empty
+    });
+
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully", user });
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        extraRoles: user.extraRoles,
+      },
+    });
   } catch (err) {
+    console.error("❌ Error registering user:", err);
     res.status(500).json({ message: "Error registering user", error: err.message });
   }
 };
@@ -51,14 +71,13 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error("❌ Error logging in:", err);
     res.status(500).json({ message: "Error logging in", error: err.message });
   }
 };
 
 /**
  * Assign role
- * - Registrar can assign: Student, Moderator, SSG
- * - SuperAdmin can assign: Registrar, Admin
  */
 exports.assignRole = async (req, res) => {
   try {
@@ -79,7 +98,6 @@ exports.assignRole = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "Target user not found" });
 
-    // Special case: SSG is stored in extraRoles
     if (role === "SSG") {
       if (!user.extraRoles.includes("SSG")) {
         user.extraRoles.push("SSG");
@@ -91,6 +109,7 @@ exports.assignRole = async (req, res) => {
     await user.save();
     res.json({ message: `Role ${role} assigned to ${user.fullName}`, user });
   } catch (err) {
+    console.error("❌ Error assigning role:", err);
     res.status(500).json({ message: "Error assigning role", error: err.message });
   }
 };
