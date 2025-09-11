@@ -21,11 +21,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const emailOrUsername = document.getElementById("username").value.trim();
       const password = passwordInput.value.trim();
 
+      if (!emailOrUsername || !password) {
+        alert("❌ Please enter both username/email and password");
+        return;
+      }
+
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ emailOrUsername, password }), // ✅ match backend
+          body: JSON.stringify({ emailOrUsername, password }), // ✅ backend expects this
         });
 
         const data = await res.json();
@@ -35,11 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Save user to localStorage
+        // Save user in localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
 
         alert("✅ Login successful!");
-        window.location.href = "welcome.html"; // redirect
+        window.location.href = "welcome.html"; // ✅ redirect after login
       } catch (err) {
         console.error("Login error:", err);
         alert("❌ Network error. Please try again.");
