@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Only Registrar or SuperAdmin can access
   if (!["Registrar", "SuperAdmin"].includes(user.role)) {
     alert("❌ Access denied");
-    window.location.href = "welcome.html";
+    window.location.href = "../welcome.html";
     return;
   }
 
@@ -14,37 +14,72 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const enrollees = await apiFetch("/api/enrollment/pending");
 
-    enrollees.forEach(enrollee => {
-      const li = document.createElement("li");
-      li.className = "enrollee-item";
-      li.innerHTML = `
+    if (!enrollees.length) {
+      enrolleeList.innerHTML = "<p>No pending enrollees ✅</p>";
+      return;
+    }
+
+    enrollees.forEach((enrollee) => {
+      const card = document.createElement("div");
+      card.className = "enrollee-card";
+
+      card.innerHTML = `
         <div class="summary">
-          <strong>${enrollee.name}</strong> (${enrollee.level.toUpperCase()} - ${enrollee.strand || "N/A"})
+          <h3>${enrollee.name}</h3>
+          <p><b>Level:</b> ${enrollee.level.toUpperCase()} 
+             ${enrollee.strand ? ` - ${enrollee.strand}` : ""}</p>
         </div>
         <div class="details" style="display:none;">
           <p><b>LRN:</b> ${enrollee.lrn}</p>
           <p><b>School Year:</b> ${enrollee.schoolYear}</p>
-          <p><b>Uploaded Docs:</b></p>
+
+          <h4>📂 Uploaded Documents:</h4>
           <ul>
-            ${enrollee.documents?.reportCard ? `<li><a href="${enrollee.documents.reportCard}" target="_blank">📄 Report Card</a></li>` : ""}
-            ${enrollee.documents?.goodMoral ? `<li><a href="${enrollee.documents.goodMoral}" target="_blank">📄 Good Moral</a></li>` : ""}
-            ${enrollee.documents?.birthCertificate ? `<li><a href="${enrollee.documents.birthCertificate}" target="_blank">📄 Birth Certificate</a></li>` : ""}
+            ${
+              enrollee.documents?.reportCard
+                ? `<li><a href="/uploads/enrollments/${enrollee.documents.reportCard}" target="_blank">📄 Report Card</a></li>`
+                : ""
+            }
+            ${
+              enrollee.documents?.goodMoral
+                ? `<li><a href="/uploads/enrollments/${enrollee.documents.goodMoral}" target="_blank">📄 Good Moral</a></li>`
+                : ""
+            }
+            ${
+              enrollee.documents?.birthCert
+                ? `<li><a href="/uploads/enrollments/${enrollee.documents.birthCert}" target="_blank">📄 Birth Certificate</a></li>`
+                : ""
+            }
+            ${
+              enrollee.documents?.otherDocs?.length
+                ? enrollee.documents.otherDocs
+                    .map(
+                      (doc, i) =>
+                        `<li><a href="/uploads/enrollments/${doc}" target="_blank">📄 Other Document ${i + 1}</a></li>`
+                    )
+                    .join("")
+                : ""
+            }
           </ul>
-          <button class="approve-btn" data-id="${enrollee._id}">✅ Approve</button>
-          <button class="reject-btn" data-id="${enrollee._id}">❌ Reject</button>
+
+          <div class="actions">
+            <button class="approve-btn" data-id="${enrollee._id}">✅ Approve</button>
+            <button class="reject-btn" data-id="${enrollee._id}">❌ Reject</button>
+          </div>
         </div>
       `;
 
-      // Toggle details
-      li.querySelector(".summary").addEventListener("click", () => {
-        const details = li.querySelector(".details");
-        details.style.display = details.style.display === "none" ? "block" : "none";
+      // Toggle details on summary click
+      card.querySelector(".summary").addEventListener("click", () => {
+        const details = card.querySelector(".details");
+        details.style.display =
+          details.style.display === "none" ? "block" : "none";
       });
 
-      enrolleeList.appendChild(li);
+      enrolleeList.appendChild(card);
     });
 
-    // Approve/Reject buttons
+    // Handle approve/reject
     enrolleeList.addEventListener("click", async (e) => {
       if (e.target.classList.contains("approve-btn")) {
         const id = e.target.dataset.id;
@@ -59,9 +94,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         location.reload();
       }
     });
-
   } catch (err) {
-    console.error(err);
-    alert("Failed to load enrollees");
+    console.error("Failed to load enrollees:", err);
+    enrolleeList.innerHTML = "<p>⚠ Failed to load pending enrollees.</p>";
   }
 });
