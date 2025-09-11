@@ -8,22 +8,24 @@
   <script src="auth.js" defer></script>
   <script src="script.js" defer></script>
 </head>
-<body>
-  <div class="center-box">
-    <h1>Welcome to AGRITECH School Portal</h1>
-    <p>Redirecting...</p>
+<body class="splash-body">
+  <div class="splash-container">
+    <img src="images/school-logo.png" alt="School Logo" class="splash-logo">
+    <h1>Welcome to <span class="highlight">SNNHS SCHOOL PORTAL</span></h1>
+    <p class="redirect-text">Redirecting you to the right page...</p>
+    <div class="loader"></div>
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // ✅ Check if token exists in localStorage
       const token = localStorage.getItem("token");
-
-      if (token) {
-        window.location.href = "welcome.html";
-      } else {
-        window.location.href = "login.html";
-      }
+      setTimeout(() => {
+        if (token) {
+          window.location.href = "welcome.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      }, 1500); // ⏳ small delay for splash effect
     });
   </script>
 </body>
