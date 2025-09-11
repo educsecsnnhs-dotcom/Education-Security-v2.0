@@ -488,3 +488,53 @@ main {
   background: #457b9d;
   color: white;
 }
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.enrollee-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  padding: 1rem;
+  background: #fff;
+}
+
+.enrollee-item .summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #1d3557;
+}
+
+.enrollee-item .summary:hover {
+  text-decoration: underline;
+}
+
+.enrollee-item .details {
+  margin-top: 1rem;
+  padding-left: 1rem;
+}
+
+.approve-btn {
+  background: #2a9d8f;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.reject-btn {
+  background: #e63946;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.approve-btn:hover { background: #21867a; }
+.reject-btn:hover { background: #c53030; }
