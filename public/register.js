@@ -1,20 +1,16 @@
-// public/register.js
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
-  const togglePassword = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("password");
+  const togglePassword = document.getElementById("togglePassword");
 
-  // 👁️ Toggle password visibility
-  if (togglePassword && passwordInput) {
+  if (togglePassword) {
     togglePassword.addEventListener("click", () => {
-      const type =
-        passwordInput.getAttribute("type") === "password" ? "text" : "password";
-      passwordInput.setAttribute("type", type);
+      const type = passwordInput.type === "password" ? "text" : "password";
+      passwordInput.type = type;
       togglePassword.textContent = type === "password" ? "👁️" : "🙈";
     });
   }
 
-  // 📌 Form submit
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -24,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = passwordInput.value.trim();
 
       if (!fullName || !email || !password) {
-        alert("⚠️ Please fill in all fields");
+        alert("⚠️ All fields are required");
         return;
       }
 
@@ -32,21 +28,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fullName, email, password }), // ✅ matches backend
+          body: JSON.stringify({ fullName, email, password }),
         });
 
         const data = await res.json();
-
         if (!res.ok) {
           alert("❌ " + (data.message || "Registration failed"));
           return;
         }
 
         alert("✅ Registered successfully! Please log in.");
-        window.location.href = "login.html"; // redirect to login
+        window.location.href = "login.html";
       } catch (err) {
         console.error("Register error:", err);
-        alert("❌ Network error. Please try again.");
+        alert("❌ Network error. Try again.");
       }
     });
   }
