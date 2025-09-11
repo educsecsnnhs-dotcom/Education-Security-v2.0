@@ -1,3 +1,4 @@
+// public/js/menu.js
 document.addEventListener("DOMContentLoaded", () => {
   const user = Auth.getUser();
   const menuList = document.getElementById("menuList");
@@ -7,24 +8,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Menu definitions with icons
   const menus = {
-    User: [{ name: "Enrollment", link: "pages/enrollment.html", icon: "📝" }],
+    User: [
+      { name: "Enrollment", link: "pages/enrollment.html", icon: "📝" }
+    ],
     Student: [
       { name: "Grades", link: "pages/grades.html", icon: "📊" },
       { name: "Attendance", link: "pages/attendance.html", icon: "🕒" },
       { name: "Vote", link: "pages/vote.html", icon: "🗳️" },
     ],
-    Moderator: [{ name: "Record Book", link: "pages/recordbook.html", icon: "📚" }],
+    Moderator: [
+      { name: "Record Book", link: "pages/recordbook.html", icon: "📚" }
+    ],
     Registrar: [
       { name: "Enrollee", link: "pages/registrar.html", icon: "🧾" },
       { name: "Enrolled", link: "pages/enrolled.html", icon: "✅" },
       { name: "Archives", link: "pages/archives.html", icon: "📂" },
+      { name: "Role Management", link: "pages/roles.html", icon: "👥" }, // ✅ Added
     ],
     Admin: [
       { name: "Management", link: "pages/admin.html", icon: "⚙️" },
       { name: "Announcements", link: "pages/announcements.html", icon: "📢" },
     ],
     SuperAdmin: [], // Will see everything (we merge later)
-    SSG: [{ name: "SSG Management", link: "pages/ssg.html", icon: "🏛️" }],
+    SSG: [
+      { name: "SSG Management", link: "pages/ssg.html", icon: "🏛️" }
+    ],
   };
 
   // Start with base User menu
@@ -65,7 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.href = item.link;
-    a.innerHTML = `<span class="icon">${item.icon || "📄"}</span><span class="label">${item.name}</span>`;
+    a.innerHTML = `
+      <span class="icon">${item.icon || "📄"}</span>
+      <span class="label">${item.name}</span>
+    `;
     a.classList.add("menu-link");
     li.appendChild(a);
     menuList.appendChild(li);
