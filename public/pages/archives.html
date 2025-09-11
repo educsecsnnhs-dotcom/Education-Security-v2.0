@@ -2,47 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Student Archives</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="js/auth.js"></script>
-  <script defer src="js/script.js"></script>
-  <script defer src="js/archives.js"></script>
+  <title>Registrar - Archives</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/archives.js"></script>
 </head>
 <body>
   <header>
-    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
-    <h1>📚 Student Archives</h1>
+    <button onclick="window.location.href='../welcome.html'" class="back-btn">⬅ Back</button>
+    <h1>📂 Archived Students</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
   <main>
-    <section>
-      <h2>🔍 Search Archives</h2>
-      <label>
-        Name:
-        <input type="text" id="searchName" placeholder="Student name">
-      </label>
-      <label>
-        Batch:
-        <input type="number" id="searchBatch" placeholder="e.g. 2024">
-      </label>
-      <button id="applySearch">Search</button>
+    <!-- 🔍 Filters -->
+    <section class="card">
+      <h2>🔍 Search & Filters</h2>
+      <div class="filters">
+        <input type="text" id="searchName" placeholder="Search by name...">
+        <select id="filterGrade">
+          <option value="">All Grades</option>
+          <option value="7">Grade 7</option>
+          <option value="8">Grade 8</option>
+          <option value="9">Grade 9</option>
+          <option value="10">Grade 10</option>
+          <option value="11">Grade 11</option>
+          <option value="12">Grade 12</option>
+        </select>
+        <input type="text" id="filterReason" placeholder="Reason (dropout, transfer)">
+        <button id="applyFilters">Apply</button>
+        <button id="exportCsv">⬇ Export CSV</button>
+      </div>
     </section>
 
-    <section>
+    <!-- 📊 Stats -->
+    <section class="card">
+      <h2>📊 Archive Stats</h2>
+      <div id="statsBox">
+        <p><b>Total Archived:</b> <span id="statTotal">0</span></p>
+        <p><b>Dropouts:</b> <span id="statDropout">0</span></p>
+        <p><b>Transfers:</b> <span id="statTransfer">0</span></p>
+        <p><b>Others:</b> <span id="statOthers">0</span></p>
+      </div>
+    </section>
+
+    <!-- 📋 Archived Students -->
+    <section class="card">
       <h2>📋 Archived Students</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>LRN</th>
-            <th>Name</th>
-            <th>Grade/Strand</th>
-            <th>Section</th>
-            <th>Batch</th>
-          </tr>
-        </thead>
-        <tbody id="archiveTable"></tbody>
-      </table>
+      <div id="archiveList" class="archive-container"></div>
     </section>
   </main>
 </body>
