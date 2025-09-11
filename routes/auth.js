@@ -11,10 +11,10 @@ const router = express.Router();
  */
 router.post("/register", async (req, res) => {
   try {
-    const { fullName, email, password, role } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
     const existing = await User.findOne({ email });
@@ -26,11 +26,10 @@ router.post("/register", async (req, res) => {
     const encryptedPassword = encryptPassword(password);
 
     const user = new User({
-      fullName,
       email,
       password: encryptedPassword,
       role: role || "User",   // default role
-      extraRoles: []          // optional roles
+      extraRoles: []          // optional addon roles
     });
 
     await user.save();
@@ -39,7 +38,6 @@ router.post("/register", async (req, res) => {
       message: "✅ User registered successfully",
       user: {
         id: user._id,
-        fullName: user.fullName,
         email: user.email,
         role: user.role,
         extraRoles: user.extraRoles,
@@ -57,17 +55,13 @@ router.post("/register", async (req, res) => {
  */
 router.post("/login", async (req, res) => {
   try {
-    const { emailOrUsername, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!emailOrUsername || !password) {
-      return res.status(400).json({ message: "Email/Username and password are required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Find user by email or fullName
-    const user = await User.findOne({
-      $or: [{ email: emailOrUsername }, { fullName: emailOrUsername }],
-    });
-
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -85,7 +79,6 @@ router.post("/login", async (req, res) => {
       message: "✅ Login successful",
       user: {
         id: user._id,
-        fullName: user.fullName,
         email: user.email,
         role: user.role,
         extraRoles: user.extraRoles,
