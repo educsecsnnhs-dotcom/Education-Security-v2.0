@@ -1,4 +1,3 @@
-// controllers/recordbookController.js
 const RecordBook = require("../models/RecordBook");
 const Section = require("../models/Section");
 const User = require("../models/User");
@@ -11,7 +10,6 @@ const {
 
 /**
  * Create record book for a section + subject
- * Auto-creates a Google Sheet and links it
  */
 exports.createRecordBook = async (req, res) => {
   try {
@@ -92,24 +90,6 @@ exports.getStudentGrades = async (req, res) => {
 };
 
 /**
- * List all sheets (tabs) inside a record book
- */
-exports.getSheets = async (req, res) => {
-  try {
-    const { recordBookId } = req.params;
-
-    const recordBook = await RecordBook.findById(recordBookId);
-    if (!recordBook) return res.status(404).json({ message: "Record book not found" });
-
-    const sheets = await listSheets(recordBook.sheetId);
-
-    res.json(sheets);
-  } catch (err) {
-    res.status(500).json({ message: "Error listing sheets", error: err.message });
-  }
-};
-
-/**
  * Finalize grades (lock editing)
  */
 exports.finalizeGrades = async (req, res) => {
@@ -143,5 +123,33 @@ exports.markAttendance = async (req, res) => {
     res.json({ message: "Attendance updated successfully" });
   } catch (err) {
     res.status(500).json({ message: "Error updating attendance", error: err.message });
+  }
+};
+
+/**
+ * Get record book details by ID
+ */
+exports.getRecordBookById = async (req, res) => {
+  try {
+    const recordBook = await RecordBook.findById(req.params.id)
+      .populate("sectionId")
+      .populate("teacher");
+    if (!recordBook) return res.status(404).json({ message: "Record book not found" });
+    res.json(recordBook);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching record book", error: err.message });
+  }
+};
+
+/**
+ * Get sheet/tab names for a Google Sheet
+ */
+exports.getSheetTabs = async (req, res) => {
+  try {
+    const { sheetId } = req.params;
+    const tabs = await listSheets(sheetId); // ✅ fixed to use listSheets util
+    res.json(tabs);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching sheet tabs", error: err.message });
   }
 };
