@@ -1,97 +1,77 @@
+// routes/roles.js
 const express = require("express");
-const User = require("../models/User");
-const { encryptPassword, comparePassword } = require("../utils/caesar");
-
 const router = express.Router();
+const User = require("../models/User");
+const { authRequired, requireRole } = require("../middleware/roleMiddleware");
+const { encryptPassword } = require("../utils/caesar");
 
 /**
- * @route   POST /api/auth/register
- * @desc    Register a new user (password encrypted with Caesar cipher)
+ * SuperAdmin → promote User to Registrar or Admin
  */
-router.post("/register", async (req, res) => {
+router.post("/promote/superadmin", authRequired, requireRole("SuperAdmin"), async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    const { userId, role } = req.body;
+    if (!["Registrar", "Admin"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role for SuperAdmin promotion" });
     }
 
-    const existing = await User.findOne({ email });
-    if (existing) {
-      return res.status(400).json({ message: "Email already exists" });
-    }
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Encrypt password with Caesar
-    const encryptedPassword = encryptPassword(password);
-
-    const user = new User({
-      email,
-      password: encryptedPassword,
-      role: role || "User",   // default role
-      extraRoles: []          // optional addon roles
-    });
-
+    user.role = role;
     await user.save();
 
-    res.status(201).json({
-      message: "✅ User registered successfully",
-      user: {
-        id: user._id,
-        email: user.email,
-        role: user.role,
-        extraRoles: user.extraRoles,
-      },
-    });
+    res.json({ message: `✅ User promoted to ${role}`, user });
   } catch (err) {
-    console.error("❌ Register error:", err);
+    console.error("Promotion error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
 /**
- * @route   POST /api/auth/login
- * @desc    Login user (compare Caesar-encrypted passwords)
+ * Registrar → promote User to Student
  */
-router.post("/login", async (req, res) => {
+router.post("/promote/registrar", authRequired, requireRole("Registrar"), async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { userId } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    user.role = "Student";
+    await user.save();
 
-    // Compare input with stored password
-    if (!comparePassword(password, user.password)) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // Success
-    res.json({
-      message: "✅ Login successful",
-      user: {
-        id: user._id,
-        email: user.email,
-        role: user.role,
-        extraRoles: user.extraRoles,
-      },
-    });
+    res.json({ message: "✅ User promoted to Student", user });
   } catch (err) {
-    console.error("❌ Login error:", err);
+    console.error("Registrar promotion error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
 /**
- * @route   POST /api/auth/logout
- * @desc    Simple logout
+ * Registrar → assign/remove SSG role (extraRoles array)
  */
-router.post("/logout", (req, res) => {
-  res.json({ message: "✅ Logged out successfully" });
+router.post("/ssg/toggle", authRequired, requireRole("Registrar"), async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.extraRoles.includes("SSG")) {
+      // remove
+      user.extraRoles = user.extraRoles.filter(r => r !== "SSG");
+    } else {
+      // add
+      user.extraRoles.push("SSG");
+    }
+
+    await user.save();
+    res.json({ message: "✅ Updated SSG status", user });
+  } catch (err) {
+    console.error("SSG toggle error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 module.exports = router;
