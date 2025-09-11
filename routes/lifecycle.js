@@ -3,10 +3,8 @@ const multer = require("multer");
 const path = require("path");
 const express = require("express");
 const router = express.Router();
-
 const lifecycleController = require("../controllers/lifecycleController");
 const { authRequired } = require("../controllers/authController");
-const Enrollment = require("../models/Enrollment"); // ✅ Needed for archived route
 
 // Storage setup
 const storage = multer.diskStorage({
@@ -25,14 +23,19 @@ function fileFilter(req, file, cb) {
   if (allowed.test(ext)) {
     cb(null, true);
   } else {
-    cb(new Error("Only PDF, JPG, and PNG files are allowed"));
+    cb(new Error("❌ Only PDF, JPG, and PNG files are allowed"));
   }
 }
 
-const upload = multer({ storage, fileFilter });
+// ✅ Limit: 5MB per file
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
 
-// 📂 Fetch archived students (Registrar & SuperAdmin only)
-router.get("/enrollment/archived", authRequired, async (req, res) => {
+// Archived students
+router.get("/enrollment/archived", async (req, res) => {
   try {
     const students = await Enrollment.find({ archived: true });
     res.json(students);
@@ -41,14 +44,10 @@ router.get("/enrollment/archived", authRequired, async (req, res) => {
   }
 });
 
-// ♻ Restore archived student
-router.post(
-  "/enrollment/:id/restore",
-  authRequired,
-  lifecycleController.restoreStudent
-);
+// Restore student
+router.post("/enrollment/:id/restore", lifecycleController.restoreStudent);
 
-// 📝 Student submits enrollment with documents
+// Student submits enrollment
 router.post(
   "/enroll",
   authRequired, // must be logged in
