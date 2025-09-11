@@ -73,13 +73,23 @@ main {
   overflow-y: auto;
 }
 
-/* Forms */
+/* -----------------------
+   Forms (Register/Login)
+------------------------ */
 .form-container {
   max-width: 400px;
   margin: 80px auto;
-  padding: 20px;
+  padding: 25px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  color: #004080;
 }
 
 form {
@@ -89,17 +99,68 @@ form {
 
 form label {
   margin: 8px 0 4px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
 }
 
 form input {
-  padding: 8px;
-  margin-bottom: 12px;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
-form button {
-  padding: 10px;
+/* Password Wrapper */
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Buttons */
+form button,
+.btn {
+  padding: 12px;
   background: #004080;
   color: white;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 15px;
+  transition: background 0.3s ease;
+}
+
+form button:hover,
+.btn:hover {
+  background: #003366;
+}
+
+p {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+a {
+  color: #004080;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
