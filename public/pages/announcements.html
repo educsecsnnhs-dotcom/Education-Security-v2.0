@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <title>📢 Announcements</title>
   <link rel="stylesheet" href="../style.css">
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <script defer src="../js/auth.js"></script>
-  <script defer src="../js/announcement.js"></script>
+  <script defer src="../js/announcements.js"></script>
 </head>
 <body>
   <header>
@@ -16,33 +15,52 @@
   </header>
 
   <main>
-    <!-- Post Form (Admins, SSG, Moderators only) -->
-    <section id="postSection" style="display:none;">
-      <h2>Create Announcement</h2>
-      <form id="postForm" enctype="multipart/form-data">
-        <label>Visibility:
-          <select name="visibility" id="visibility" required>
-            <option value="school">School-wide</option>
-            <option value="department">Department</option>
-            <option value="strand">Strand</option>
-          </select>
-        </label>
-        <input type="text" name="target" id="target" placeholder="Target Dept/Strand (if applicable)" />
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="school">School-wide</button>
+      <button class="tab" data-tab="department">Department</button>
+      <button class="tab" data-tab="section">Section</button>
+    </nav>
 
-        <div id="editor"></div>
-        <input type="file" name="images" id="images" multiple />
+    <!-- Post button (hidden unless authorized) -->
+    <div id="postArea">
+      <button id="newAnnouncementBtn" style="display:none;">➕ New Announcement</button>
+    </div>
 
-        <button type="submit">📨 Post</button>
-      </form>
-    </section>
-
-    <!-- Feed -->
-    <section id="feed">
-      <h2>Latest Announcements</h2>
-      <div id="announcements"></div>
-    </section>
+    <!-- Announcement containers -->
+    <section id="school" class="tab-content active"></section>
+    <section id="department" class="tab-content"></section>
+    <section id="section" class="tab-content"></section>
   </main>
 
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <!-- Modal for posting -->
+  <div id="announcementModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Create Announcement</h2>
+      <form id="announcementForm">
+        <label>Title</label>
+        <input type="text" id="title" required>
+
+        <label>Content</label>
+        <textarea id="content" rows="5" required></textarea>
+
+        <label>Image (optional)</label>
+        <input type="file" id="image">
+
+        <label>Scope</label>
+        <select id="scope">
+          <option value="school">School-wide</option>
+          <option value="department">Department</option>
+          <option value="section">Section</option>
+        </select>
+
+        <label id="targetLabel" style="display:none;">Target</label>
+        <input type="text" id="target" placeholder="e.g., STEM / 11-STEM-A" style="display:none;">
+
+        <button type="submit">Post</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
