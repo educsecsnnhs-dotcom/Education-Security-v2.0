@@ -1,4 +1,6 @@
-/* Reset */
+/* =======================
+   Reset & Base
+======================= */
 * {
   margin: 0;
   padding: 0;
@@ -10,11 +12,13 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background: #f5f6fa;
+  color: #333;
 }
 
-/* -----------------------
+/* =======================
    Header
------------------------- */
+======================= */
 header {
   display: flex;
   justify-content: center;
@@ -23,6 +27,8 @@ header {
   color: white;
   padding: 10px;
   position: relative;
+  height: 60px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 header .logout {
@@ -43,20 +49,28 @@ header .logout:hover {
 
 .title {
   font-size: 1.5rem;
+  font-weight: bold;
 }
 
-/* -----------------------
-   Sidebar
------------------------- */
+/* =======================
+   Sidebar (collapsible)
+======================= */
 .sidebar {
   position: fixed;
-  top: 50px;
+  top: 60px; /* below header */
   left: 0;
-  width: 220px;
+  width: 60px; /* collapsed */
   height: 100%;
-  background: #333;
+  background: #222;
+  overflow-x: hidden;
+  transition: width 0.3s ease;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
   padding-top: 10px;
-  overflow-y: auto;
+  z-index: 1000;
+}
+
+.sidebar:hover {
+  width: 200px; /* expanded */
 }
 
 .sidebar ul {
@@ -66,39 +80,62 @@ header .logout:hover {
 }
 
 .sidebar li {
-  margin: 4px 0;
+  margin: 6px 0;
 }
 
 .sidebar a {
+  display: flex;
+  align-items: center;
   color: #dfe6e9;
   text-decoration: none;
-  display: block;
-  padding: 10px 16px;
-  border-radius: 4px;
-  transition: background 0.3s, color 0.3s;
+  padding: 10px 14px;
+  border-radius: 6px;
+  transition: background 0.2s ease, padding-left 0.2s ease;
+  white-space: nowrap;
 }
 
 .sidebar a:hover,
 .sidebar a.active {
-  background: #0984e3;
+  background: #004080;
   color: #fff;
+  padding-left: 18px;
 }
 
-/* -----------------------
+.sidebar .icon {
+  display: inline-block;
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.sidebar .label {
+  display: none;
+}
+
+.sidebar:hover .label {
+  display: inline;
+}
+
+/* =======================
    Main Layout
------------------------- */
+======================= */
 main {
-  margin-left: 240px; /* match sidebar width */
-  margin-top: 60px;   /* match header height */
+  margin-left: 60px; /* collapsed sidebar */
+  margin-top: 60px;  /* header height */
   padding: 20px;
   flex: 1;
   overflow-y: auto;
-  background: #f5f6fa;
+  transition: margin-left 0.3s ease;
 }
 
-/* -----------------------
+.sidebar:hover ~ main {
+  margin-left: 200px; /* expanded sidebar */
+}
+
+/* =======================
    Forms (Register/Login)
------------------------- */
+======================= */
 .form-container {
   max-width: 400px;
   margin: 80px auto;
@@ -188,84 +225,28 @@ a:hover {
   text-decoration: underline;
 }
 
-/* -----------------------
+/* =======================
    Welcome Page Cards
------------------------- */
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-
-.card h2 {
-  margin-top: 0;
-  color: #003366;
-  display: flex;
-  align-items: center;
-  font-size: 1.2rem;
-}
-
-.card h2 span {
-  margin-right: 10px;
-}
-
-/* -----------------------
-   Welcome Page Styling
------------------------- */
-.sidebar {
-  position: fixed;
-  top: 50px;
-  left: 0;
-  width: 60px;
-  height: 100%;
-  background: #222;
-  overflow-x: hidden;
-  transition: width 0.3s ease;
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar:hover {
-  width: 200px;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 10px 0;
-}
-
-.sidebar li {
-  margin: 6px 0;
-}
-
-.sidebar a {
-  color: #fff;
-  text-decoration: none;
-  display: block;
-  padding: 10px 16px;
-  border-radius: 6px;
-  transition: background 0.2s ease, padding-left 0.2s ease;
-}
-
-.sidebar a:hover {
-  background: #004080;
-  padding-left: 22px;
-}
-
-/* Main content cards */
+======================= */
 .card {
   max-width: 800px;
   margin: 30px auto;
   padding: 25px;
   border-radius: 12px;
   background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .card h2 {
   margin-bottom: 15px;
   color: #004080;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.card h2 span {
+  margin-right: 10px;
 }
 
 .announcement-list {
