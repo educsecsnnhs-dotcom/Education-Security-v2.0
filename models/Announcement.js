@@ -1,21 +1,21 @@
 const mongoose = require("mongoose");
 
 const announcementSchema = new mongoose.Schema({
-  author: {
-    id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    name: String,
-    role: String,
-    department: String,
-    strand: String
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  imageUrl: { type: String }, // optional, for images
+
+  scope: { 
+    type: String, 
+    enum: ["school", "department", "section"], 
+    required: true 
   },
-  visibility: {
-    type: String,
-    enum: ["school", "department", "strand"],
-    required: true
-  },
-  target: { type: String }, // department name OR strand name (if applicable)
-  content: { type: String, required: true }, // stored as HTML from Quill
-  images: [String], // uploaded file paths
+  target: { type: String }, 
+  // "school" → null
+  // "department" → e.g. "STEM", "HUMSS"
+  // "section" → e.g. "11-STEM-A"
+
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now }
 });
 
