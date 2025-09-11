@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("password");
   const togglePassword = document.getElementById("togglePassword");
 
+  // Show/hide password
   if (togglePassword) {
     togglePassword.addEventListener("click", () => {
       const type = passwordInput.type === "password" ? "text" : "password";
@@ -11,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Handle form submit
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -36,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+        // Save logged-in user to localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
 
         alert("✅ Login successful!");
