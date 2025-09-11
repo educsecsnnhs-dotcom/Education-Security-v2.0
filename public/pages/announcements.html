@@ -2,49 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Department Announcements - AGRITECH</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="js/auth.js"></script>
-  <script defer src="js/script.js"></script>
-  <script defer src="js/menu.js"></script>
-  <script defer src="js/announcements.js"></script>
+  <title>📢 Announcements</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/announcement.js"></script>
 </head>
 <body>
-  <!-- Top bar -->
   <header>
-    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
-    <h1>📢 Department Announcements</h1>
+    <button onclick="window.location.href='../welcome.html'">⬅ Back</button>
+    <h1>📢 Announcements</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
-  <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
-    <ul id="menuList"></ul>
-  </nav>
-
-  <!-- Main Content -->
   <main>
-    <!-- Department Selector -->
-    <section>
-      <h2>🎓 Select Department / Strand</h2>
-      <select id="deptSelect"></select>
-    </section>
-
-    <!-- Post Announcement (only for SuperAdmin, Admin, Moderator) -->
+    <!-- Post Form (Admins, SSG, Moderators only) -->
     <section id="postSection" style="display:none;">
-      <h2>✍️ Post New Announcement</h2>
-      <form id="postForm">
-        <input type="text" id="title" placeholder="Title" required />
-        <textarea id="content" placeholder="Announcement content..." required></textarea>
-        <button type="submit">Post</button>
+      <h2>Create Announcement</h2>
+      <form id="postForm" enctype="multipart/form-data">
+        <label>Visibility:
+          <select name="visibility" id="visibility" required>
+            <option value="school">School-wide</option>
+            <option value="department">Department</option>
+            <option value="strand">Strand</option>
+          </select>
+        </label>
+        <input type="text" name="target" id="target" placeholder="Target Dept/Strand (if applicable)" />
+
+        <div id="editor"></div>
+        <input type="file" name="images" id="images" multiple />
+
+        <button type="submit">📨 Post</button>
       </form>
     </section>
 
-    <!-- Department Announcements -->
-    <section>
-      <h2>📌 Announcements</h2>
-      <div id="deptAnnouncements"></div>
+    <!-- Feed -->
+    <section id="feed">
+      <h2>Latest Announcements</h2>
+      <div id="announcements"></div>
     </section>
   </main>
+
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 </body>
 </html>
