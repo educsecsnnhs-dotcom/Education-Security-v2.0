@@ -1,38 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Grades</title>
-  <link rel="stylesheet" href="../style.css"/>
-  <script src="../js/auth.js"></script>
-  <script src="../js/grades.js" defer></script>
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>📊 My Grades</h1>
-      <a href="../welcome.html" class="back-link">← Back</a>
-    </header>
+  <header>
+    <h1>📊 My Grades</h1>
+    <button onclick="window.location.href='../welcome.html'">🏠 Back to Home</button>
+  </header>
 
-    <section class="grades-section">
-      <table id="gradesTable" class="styled-table">
+  <main class="container">
+    <section class="student-info card">
+      <h2>Student Information</h2>
+      <p><strong>Name:</strong> <span id="studentName"></span></p>
+      <p><strong>LRN:</strong> <span id="studentLRN"></span></p>
+      <p><strong>Section:</strong> <span id="studentSection"></span></p>
+    </section>
+
+    <section class="grades-section card">
+      <h2>📖 Partial Grades (Ongoing)</h2>
+      <table>
         <thead>
           <tr>
             <th>Subject</th>
-            <th>Quarter 1</th>
-            <th>Quarter 2</th>
-            <th>Quarter 3</th>
-            <th>Quarter 4</th>
+            <th>Q1</th>
+            <th>Q2</th>
+            <th>Q3</th>
+            <th>Q4</th>
+            <th>Average</th>
+          </tr>
+        </thead>
+        <tbody id="partialGrades"></tbody>
+      </table>
+    </section>
+
+    <section class="grades-section card">
+      <h2>✅ Official Grades (Finalized)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th>
             <th>Final Grade</th>
             <th>Remarks</th>
           </tr>
         </thead>
-        <tbody id="gradesBody">
-          <tr><td colspan="7">Loading your grades...</td></tr>
-        </tbody>
+        <tbody id="officialGrades"></tbody>
       </table>
     </section>
-  </div>
+  </main>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/grades.js"></script>
 </body>
 </html>
