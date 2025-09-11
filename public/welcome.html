@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Welcome - AGRITECH</title>
+  <title>Welcome - EDU-SEC</title>
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Scripts -->
   <script defer src="js/auth.js"></script>
   <script defer src="js/script.js"></script>
   <script defer src="js/menu.js"></script>
@@ -12,7 +14,8 @@
 <body>
   <!-- Top bar -->
   <header>
-    <h1 class="title">AGRITECH School Portal</h1>
+    <h1 class="title">SNNHS SCHOOL PORTAL</h1>
+    <div class="clock" id="clock">--:--:--</div>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
@@ -23,6 +26,14 @@
 
   <!-- Main Content -->
   <main>
+    <!-- User Info -->
+    <section class="user-info">
+      <h2>👋 Welcome, <span id="userName">User</span></h2>
+      <p>Role: <strong id="userRole">Role</strong></p>
+      <p id="todayDate"></p>
+    </section>
+
+    <!-- Announcements -->
     <section class="card">
       <h2>📌 School-wide Announcements</h2>
       <div id="schoolAnnouncements" class="announcement-list">
@@ -30,6 +41,7 @@
       </div>
     </section>
 
+    <!-- School Info -->
     <section class="card">
       <h2>🏫 School Info</h2>
       <div class="pdf-viewer">
@@ -37,5 +49,25 @@
       </div>
     </section>
   </main>
+
+  <script>
+    // Live Clock + Date (Philippines Timezone)
+    function updateClock() {
+      const now = new Date();
+      const optionsTime = { hour12: false, timeZone: "Asia/Manila" };
+      const optionsDate = { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Manila" };
+
+      document.getElementById("clock").textContent =
+        now.toLocaleTimeString("en-PH", optionsTime);
+      document.getElementById("todayDate").textContent =
+        "Today is " + now.toLocaleDateString("en-PH", optionsDate);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Example placeholders (replace with session data)
+    document.getElementById("userName").textContent = "SuperAdmin";
+    document.getElementById("userRole").textContent = "Administrator";
+  </script>
 </body>
 </html>
