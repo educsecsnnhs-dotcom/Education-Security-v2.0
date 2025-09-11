@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const { authRequired, requireRole } = require("../middleware/roleMiddleware");
+const { authRequired, requireRole } = require("../middleware/authMiddleware");
 const { encryptPassword } = require("../utils/caesar");
 
 /**
