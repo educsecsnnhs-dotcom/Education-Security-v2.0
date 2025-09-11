@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <title>Role & Staff Management</title>
-  <link rel="stylesheet" href="../styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../css/role-management.css" />
   <script defer src="../js/auth.js"></script>
   <script defer src="../js/role-management.js"></script>
 </head>
@@ -21,84 +22,44 @@
 
   <main>
     <!-- Filters & quick stats -->
-    <section class="card">
+    <section class="card fade-in">
       <div class="row space-between">
         <div style="flex:1; margin-right:1rem;">
           <input id="globalSearch" placeholder="🔍 Search name / email / LRN" class="wide" />
         </div>
 
-        <div class="filters" style="display:flex; gap:0.5rem; align-items:center">
-          <select id="filterRole">
-            <option value="">All roles</option>
-            <option>User</option>
-            <option>Student</option>
-            <option>Moderator</option>
-            <option>Admin</option>
-            <option>Registrar</option>
-            <option>SuperAdmin</option>
-          </select>
-
-          <select id="filterExtra">
-            <option value="">All extra roles</option>
-            <option>SSG</option>
-          </select>
-
-          <select id="filterSection">
-            <option value="">All sections</option>
-          </select>
-
-          <select id="filterStrand">
-            <option value="">All strands</option>
-          </select>
-
+        <div class="filters">
+          <select id="filterRole"></select>
+          <select id="filterExtra"></select>
+          <select id="filterSection"></select>
+          <select id="filterStrand"></select>
           <button id="applyFilters" class="btn">Apply</button>
-          <button id="clearFilters" class="btn">Clear</button>
+          <button id="clearFilters" class="btn secondary">Clear</button>
         </div>
       </div>
 
-      <div class="stats-row" style="margin-top:1rem;">
-        <div class="stat">
-          <div class="stat-value" id="statTotal">0</div>
-          <div class="stat-label">Total Users</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="statTeachers">0</div>
-          <div class="stat-label">Moderators (Teachers)</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="statHeads">0</div>
-          <div class="stat-label">Dept Heads</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="statStudents">0</div>
-          <div class="stat-label">Students</div>
-        </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Users</div></div>
+        <div class="stat"><div class="stat-value" id="statTeachers">0</div><div class="stat-label">Moderators</div></div>
+        <div class="stat"><div class="stat-value" id="statHeads">0</div><div class="stat-label">Dept Heads</div></div>
+        <div class="stat"><div class="stat-value" id="statStudents">0</div><div class="stat-label">Students</div></div>
       </div>
     </section>
 
     <!-- Bulk actions -->
-    <section class="card">
+    <section class="card fade-in">
       <div class="row space-between">
-        <div>
-          <label><input type="checkbox" id="selectAll" /> Select all visible</label>
-        </div>
+        <div><label><input type="checkbox" id="selectAll" /> Select all visible</label></div>
         <div class="bulk-actions">
-          <select id="bulkAction">
-            <option value="">Bulk actions</option>
-            <option value="promoteModerator">Promote → Moderator</option>
-            <option value="promoteAdmin">Promote → Admin</option>
-            <option value="assignSection">Assign Section</option>
-            <option value="assignStrand">Assign Strand</option>
-            <option value="toggleSSG">Toggle SSG</option>
-          </select>
-          <input id="bulkInput" placeholder="Section/Strand name (if required)" />
-          <button id="runBulk" class="btn">Run</button>
+          <select id="bulkAction"></select>
+          <input id="bulkInput" placeholder="Section/Strand (if required)" />
+          <button id="runBulk" class="btn primary">Run</button>
         </div>
       </div>
     </section>
 
     <!-- User table -->
-    <section class="card">
+    <section class="card fade-in">
       <table id="usersTable" class="styled-table">
         <thead>
           <tr>
@@ -116,25 +77,24 @@
         </thead>
         <tbody></tbody>
       </table>
-      <div id="emptyNotice" style="display:none; margin-top:1rem;">No users found</div>
+      <div id="emptyNotice" class="empty">No users found</div>
     </section>
   </main>
 
-  <!-- Audit Modal -->
+  <!-- Modals -->
   <div id="auditModal" class="modal hidden">
     <div class="modal-content">
       <span class="close" id="closeAudit">&times;</span>
       <h3>📝 Audit Log</h3>
-      <div id="auditList" style="max-height:60vh; overflow:auto;"></div>
+      <div id="auditList"></div>
     </div>
   </div>
 
-  <!-- Notifications Modal -->
   <div id="notifModal" class="modal hidden">
     <div class="modal-content">
       <span class="close" id="closeNotif">&times;</span>
       <h3>🔔 Notifications</h3>
-      <div id="notifList" style="max-height:60vh; overflow:auto;"></div>
+      <div id="notifList"></div>
     </div>
   </div>
 </body>
