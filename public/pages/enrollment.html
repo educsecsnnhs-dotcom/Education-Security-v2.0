@@ -17,9 +17,10 @@
 
   <main>
     <section class="card form-card">
-      <form id="enrollmentForm">
+      <form id="enrollmentForm" enctype="multipart/form-data">
         <!-- Student Info -->
         <h2>👤 Student Information</h2>
+
         <div class="form-group">
           <label>Full Name:</label>
           <input type="text" name="name" placeholder="Juan Dela Cruz" required>
@@ -51,6 +52,28 @@
             <option value="2024-2025">2024-2025</option>
             <option value="2025-2026">2025-2026</option>
           </select>
+        </div>
+
+        <!-- File Upload Section -->
+        <h2>📂 Required Documents</h2>
+        <div class="form-group">
+          <label>Report Card (Form 138):</label>
+          <input type="file" name="reportCard" accept=".pdf,.jpg,.png" required>
+        </div>
+
+        <div class="form-group">
+          <label>Certificate of Good Moral:</label>
+          <input type="file" name="goodMoral" accept=".pdf,.jpg,.png" required>
+        </div>
+
+        <div class="form-group">
+          <label>Birth Certificate:</label>
+          <input type="file" name="birthCert" accept=".pdf,.jpg,.png" required>
+        </div>
+
+        <div class="form-group">
+          <label>Other Documents (optional):</label>
+          <input type="file" name="otherDocs" accept=".pdf,.jpg,.png" multiple>
         </div>
 
         <button type="submit" class="btn-submit">📨 Submit Enrollment</button>
