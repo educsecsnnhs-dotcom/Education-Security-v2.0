@@ -1,28 +1,43 @@
 // seedAdmin.js
+const mongoose = require("mongoose");
 const User = require("./models/User");
-const { encryptPassword } = require("./utils/caesar");
+require("dotenv").config();
 
-async function seedAdmin() {
+async function seedSuperAdmin() {
   try {
-    const email = process.env.SUPERADMIN_EMAIL || "superadmin@school.com";
-    const password = process.env.SUPERADMIN_PASSWORD || "superadmin123";
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    const email = "superadmin@school.com";
+    const password = "superadmin123"; 
+    const role = "SuperAdmin";        
 
     // Check if SuperAdmin already exists
-    let admin = await User.findOne({ role: "SuperAdmin" });
-    if (!admin) {
-      admin = new User({
-        email,
-        password: encryptPassword(password),
-        role: "SuperAdmin",
-      });
-      await admin.save();
-      console.log(`✅ SuperAdmin created: ${email}`);
+    let user = await User.findOne({ email });
+
+    if (user) {
+      console.log("⚠️ SuperAdmin already exists. Updating details...");
+      user.password = password;
+      user.role = role;
+      user.extraRoles = [];
+      await user.save();
     } else {
-      console.log("ℹ️ SuperAdmin already exists");
+      console.log("✅ Creating new SuperAdmin...");
+      user = new User({
+        email,
+        password,
+        role,
+        extraRoles: [],
+      });
+      await user.save();
     }
+
+    console.log("🎉 SuperAdmin ready:", {
+      email: user.email,
+      role: user.role,
+    });
+    process.exit();
   } catch (err) {
     console.error("❌ Error seeding SuperAdmin:", err);
-  }
-}
-
-module.exports = seedAdmin;
