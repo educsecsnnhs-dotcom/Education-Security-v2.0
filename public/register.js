@@ -4,16 +4,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const togglePassword = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("password");
 
+  // 👁️ Toggle password visibility
   if (togglePassword && passwordInput) {
     togglePassword.addEventListener("click", () => {
-      const t = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-      passwordInput.setAttribute("type", t);
-      togglePassword.textContent = t === "password" ? "👁️" : "🙈";
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      togglePassword.textContent = type === "password" ? "👁️" : "🙈";
     });
   }
 
   if (!form) return;
 
+  // 📌 Form submit
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -22,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value.trim();
 
     if (!fullName || !email || !password) {
-      alert("Please fill all fields");
+      alert("❌ Please fill all fields");
       return;
     }
 
@@ -30,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, password }),
+        body: JSON.stringify({ fullName, email, password }), // ✅ backend handles encryption
       });
 
       const data = await res.json();
