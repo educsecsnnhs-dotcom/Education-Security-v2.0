@@ -1,4 +1,4 @@
-// enrollment.js
+// public/js/enrollment.js
 document.addEventListener("DOMContentLoaded", () => {
   Auth.requireLogin(); // ensure logged in
   const user = Auth.getUser();
@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
   levelSelect.addEventListener("change", (e) => {
     strandSelect.innerHTML = "";
     if (e.target.value === "junior") {
-      juniorStrands.forEach(s => {
+      juniorStrands.forEach((s) => {
         strandSelect.innerHTML += `<option value="${s}">${s}</option>`;
       });
       strandSection.style.display = "block";
     } else if (e.target.value === "senior") {
-      seniorStrands.forEach(s => {
+      seniorStrands.forEach((s) => {
         strandSelect.innerHTML += `<option value="${s}">${s}</option>`;
       });
       strandSection.style.display = "block";
@@ -33,19 +33,20 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const formData = Object.fromEntries(new FormData(form));
+    // Collect form data including files
+    const formData = new FormData(form);
+    formData.append("userId", user._id);
 
     try {
-      const res = await apiFetch("/api/lifecycle/enroll", {
+      const res = await fetch("/api/lifecycle/enroll", {
         method: "POST",
-        body: JSON.stringify({
-          ...formData,
-          userId: user._id,
-        }),
+        body: formData, // send directly, browser sets headers
       });
 
+      if (!res.ok) throw new Error("Enrollment failed");
+
       alert("✅ Enrollment submitted successfully! Please wait for registrar approval.");
-      window.location.href = "welcome.html";
+      window.location.href = "../welcome.html"; // remember it's in /public/
     } catch (err) {
       alert("❌ Enrollment failed. Please try again.");
       console.error(err);
