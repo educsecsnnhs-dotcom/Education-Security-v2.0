@@ -1,57 +1,49 @@
 // public/login.js
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("login.js loaded ✅");
-
   const form = document.getElementById("loginForm");
   const togglePassword = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("password");
 
-  if (togglePassword && passwordInput) {
+  // 👁️ Toggle password visibility
+  if (togglePassword) {
     togglePassword.addEventListener("click", () => {
-      const t = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-      passwordInput.setAttribute("type", t);
-      togglePassword.textContent = t === "password" ? "👁️" : "🙈";
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      togglePassword.textContent = type === "password" ? "👁️" : "🙈";
     });
   }
 
-  if (!form) {
-    console.error("loginForm not found in DOM");
-    return;
-  }
+  // 📌 Form submit
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // ✅ stop page refresh
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+      const emailOrUsername = document.getElementById("username").value.trim();
+      const password = passwordInput.value.trim();
 
-    const emailOrUsername = document.getElementById("username").value.trim();
-    const password = passwordInput.value.trim();
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emailOrUsername, password }), // ✅ match backend
+        });
 
-    if (!emailOrUsername || !password) {
-      alert("Please fill both fields");
-      return;
-    }
+        const data = await res.json();
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailOrUsername, password }),
-      });
+        if (!res.ok) {
+          alert("❌ " + (data.message || "Login failed"));
+          return;
+        }
 
-      const data = await res.json();
+        // Save user to localStorage
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-      if (!res.ok) {
-        alert("❌ " + (data.message || "Login failed"));
-        return;
+        alert("✅ Login successful!");
+        window.location.href = "welcome.html"; // redirect
+      } catch (err) {
+        console.error("Login error:", err);
+        alert("❌ Network error. Please try again.");
       }
-
-      // save minimal user info
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      alert("✅ Login successful!");
-      window.location.href = "welcome.html";
-    } catch (err) {
-      console.error("Login error:", err);
-      alert("❌ Network error. Please try again.");
-    }
-  });
+    });
+  }
 });
