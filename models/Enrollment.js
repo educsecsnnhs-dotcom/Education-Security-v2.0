@@ -5,20 +5,41 @@ const enrollmentSchema = new mongoose.Schema(
   {
     studentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // links to the User model
+      ref: "User", // link to registered user
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lrn: {
+      type: String,
+      required: true,
+      minlength: 12,
+      maxlength: 12,
+    },
+    level: {
+      type: String,
+      enum: ["junior", "senior"],
       required: true,
     },
     strand: {
-      type: String, // e.g., STEM, ABM, HUMSS
-      required: true,
+      type: String,
+      required: function () {
+        return this.level === "senior" || this.level === "junior";
+      },
     },
     section: {
-      type: String, // e.g., "Section A"
+      type: String, // Optional until registrar assigns
+      default: null,
+    },
+    schoolYear: {
+      type: String,
       required: true,
     },
     yearLevel: {
-      type: Number, // e.g., 7–12
-      required: true,
+      type: Number, // numeric grade (7–12)
     },
     graduated: {
       type: Boolean,
