@@ -1042,3 +1042,22 @@ td.fail {
     display: none;
   }
 }
+
+/* Attendance specific */
+td.present {
+  color: green;
+  font-weight: bold;
+}
+td.absent {
+  color: red;
+  font-weight: bold;
+}
+td.late {
+  color: orange;
+  font-weight: bold;
+}
+.last-updated {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #666;
+}
