@@ -1,66 +1,60 @@
 const express = require("express");
+const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const Announcement = require("../models/Announcement");
-const { authRequired, requireAnyRole } = require("../middleware/authMiddleware");
 
-const router = express.Router();
-
-// 🔹 Storage for uploads
+// 🔹 Multer config
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads/announcements"),
+  destination: (req, file, cb) => {
+    cb(null, "uploads/announcements");
+  },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 const upload = multer({ storage });
 
-// 🔹 Create Announcement (Admin, SSG, Teachers)
-router.post("/", authRequired, requireAnyRole(["Admin", "SSG", "Moderator"]), upload.array("images"), async (req, res) => {
+// 🔹 GET all announcements (visible to everyone)
+router.get("/", async (req, res) => {
   try {
-    const { visibility, target, content } = req.body;
-
-    const files = req.files ? req.files.map(f => `/uploads/announcements/${f.filename}`) : [];
-
-    const announcement = new Announcement({
-      author: {
-        id: req.user._id,
-        name: req.user.name,
-        role: req.user.role,
-        department: req.user.department,
-        strand: req.user.strand
-      },
-      visibility,
-      target,
-      content,
-      images: files
-    });
-
-    await announcement.save();
-    res.json({ message: "Announcement created", announcement });
+    const announcements = await Announcement.find().sort({ createdAt: -1 });
+    res.json(announcements);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to create announcement" });
+    res.status(500).json({ error: "Failed to fetch announcements" });
   }
 });
 
-// 🔹 Get Announcements (filter by user)
-router.get("/", authRequired, async (req, res) => {
+// 🔹 POST new announcement (only staff/SSG/Admin allowed)
+router.post("/", upload.single("image"), async (req, res) => {
   try {
-    const { role, department, strand } = req.user;
+    const user = req.user; // populated by auth middleware
+    if (!user) return res.status(401).json({ error: "Unauthorized" });
 
-    const query = {
-      $or: [
-        { visibility: "school" },
-        { visibility: "department", target: department },
-        { visibility: "strand", target: strand }
-      ]
-    };
+    // restrict posting to authorized roles
+    const allowedRoles = ["Admin", "Moderator", "SSG", "Registrar"];
+    if (!allowedRoles.includes(user.role)) {
+      return res.status(403).json({ error: "Not allowed to post announcements" });
+    }
 
-    const announcements = await Announcement.find(query).sort({ createdAt: -1 });
-    res.json(announcements);
+    const announcement = new Announcement({
+      title: req.body.title,
+      content: req.body.content,
+      scope: req.body.scope,
+      target: req.body.scope !== "school" ? req.body.target : null,
+      imageUrl: req.file ? `/uploads/announcements/${req.file.filename}` : null,
+      createdBy: {
+        _id: user._id,
+        name: user.name,
+        role: user.role
+      }
+    });
+
+    await announcement.save();
+    res.json(announcement);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch announcements" });
+    console.error(err);
+    res.status(500).json({ error: "Failed to post announcement" });
   }
 });
 
