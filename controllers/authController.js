@@ -4,17 +4,21 @@ const { encryptPassword } = require("../utils/caesar");
 
 /**
  * Register a new user
- * Encrypt plain password, save to DB
  */
 exports.register = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
+
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
+    // Encrypt password before saving
     const encryptedPassword = encryptPassword(password);
 
     const user = new User({
@@ -27,45 +31,30 @@ exports.register = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        role: user.role,
-        extraRoles: user.extraRoles,
-      },
-    });
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error("❌ Error registering user:", err);
-    res.status(500).json({ message: "Error registering user", error: err.message });
+    console.error("❌ Register error:", err);
+    res.status(500).json({ message: "Error registering user" });
   }
 };
 
 /**
  * Login user
- * Encrypt plain password from user, compare with DB
  */
 exports.login = async (req, res) => {
   try {
-    const { emailOrUsername, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!emailOrUsername || !password) {
-      return res.status(400).json({ message: "emailOrUsername and password are required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Match by email OR fullName
-    const user = await User.findOne({
-      $or: [{ email: emailOrUsername }, { fullName: emailOrUsername }]
-    });
-
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Encrypt input password (not decrypt DB password!)
-    const encryptedInput = encryptPassword(password);
-
-    if (encryptedInput !== user.password) {
+    // Encrypt input password and compare with stored one
+    const encrypted = encryptPassword(password);
+    if (encrypted !== user.password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -80,48 +69,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Error logging in:", err);
-    res.status(500).json({ message: "Error logging in", error: err.message });
+    console.error("❌ Login error:", err);
+    res.status(500).json({ message: "Error logging in" });
   }
-};
-
-/**
- * Assign role
- */
-exports.assignRole = async (req, res) => {
-  try {
-    const { userId, role } = req.body;
-    const actingUser = req.user;
-
-    if (["Student", "Moderator", "SSG"].includes(role)) {
-      if (actingUser.role !== "Registrar" && actingUser.role !== "SuperAdmin") {
-        return res.status(403).json({ message: "Only Registrar or SuperAdmin can assign this role" });
-      }
-    } else if (["Registrar", "Admin"].includes(role)) {
-      if (actingUser.role !== "SuperAdmin") {
-        return res.status(403).json({ message: "Only SuperAdmin can assign this role" });
-      }
-    }
-
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "Target user not found" });
-
-    if (role === "SSG") {
-      if (!user.extraRoles.includes("SSG")) {
-        user.extraRoles.push("SSG");
-      }
-    } else {
-      user.role = role;
-    }
-
-    await user.save();
-    res.json({ message: `Role ${role} assigned to ${user.fullName}`, user });
-  } catch (err) {
-    console.error("❌ Error assigning role:", err);
-    res.status(500).json({ message: "Error assigning role", error: err.message });
-  }
-};
-
-exports.logout = async (req, res) => {
-  res.json({ message: "Logged out successfully" });
 };
