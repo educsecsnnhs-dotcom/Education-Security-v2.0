@@ -1,26 +1,26 @@
-// auth.js (frontend helper)
+const Auth = {
+  async requireLogin() {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (!res.ok) throw new Error("Not logged in");
+      return await res.json();
+    } catch {
+      window.location.href = "/index.html"; // back to login
+    }
+  },
 
-function getUser() {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
-}
+  async getUser() {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
 
-function getToken() {
-  return localStorage.getItem("token") || null;
-}
-
-function requireLogin() {
-  const user = getUser();
-  if (!user) {
-    window.location.href = "login.html";
+  async logout() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    window.location.href = "/index.html";
   }
-}
-
-function logout() {
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-  window.location.href = "login.html";
-}
-
-// Export to global scope
-window.Auth = { getUser, getToken, requireLogin, logout };
+};
