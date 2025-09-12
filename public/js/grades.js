@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "Student", "SuperAdmin") {
-    alert("Access denied. Students only.");
+  // ✅ Fix: allow only Student & SuperAdmin
+  if (!["Student", "SuperAdmin"].includes(user.role)) {
+    alert("❌ Access denied. Students only.");
     window.location.href = "/welcome.html";
     return;
   }
@@ -26,9 +27,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       const grades = await apiFetch(`/api/grades/partial/${user._id}`);
       partialBody.innerHTML = "";
 
+      if (!grades.length) {
+        partialBody.innerHTML = `<tr><td colspan="6">No partial grades available.</td></tr>`;
+        return;
+      }
+
       grades.forEach((subj, idx) => {
-        const quarters = [subj.q1, subj.q2, subj.q3, subj.q4].filter(v => v !== null && v !== undefined);
-        const avg = quarters.length ? (quarters.reduce((a, b) => a + b, 0) / quarters.length).toFixed(2) : "-";
+        const quarters = [subj.q1, subj.q2, subj.q3, subj.q4].filter(
+          v => v !== null && v !== undefined
+        );
+        const avg = quarters.length
+          ? (quarters.reduce((a, b) => a + b, 0) / quarters.length).toFixed(2)
+          : "-";
 
         const tr = document.createElement("tr");
         tr.classList.add("expandable");
@@ -43,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         partialBody.appendChild(tr);
 
-        // expandable breakdown
+        // expandable breakdown row
         const detailsTr = document.createElement("tr");
         detailsTr.classList.add("details-row");
         detailsTr.dataset.index = idx;
@@ -58,15 +68,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         partialBody.appendChild(detailsTr);
       });
 
-      // toggle
+      // toggle breakdown on click
       document.querySelectorAll(".expandable").forEach(row => {
         row.addEventListener("click", () => {
           const idx = row.dataset.index;
-          const detailsRow = document.querySelector(`.details-row[data-index="${idx}"]`);
-          detailsRow.style.display = detailsRow.style.display === "table-row" ? "none" : "table-row";
+          const detailsRow = document.querySelector(
+            `.details-row[data-index="${idx}"]`
+          );
+          detailsRow.style.display =
+            detailsRow.style.display === "table-row" ? "none" : "table-row";
         });
       });
     } catch (err) {
+      console.error("Partial grades error:", err);
       partialBody.innerHTML = `<tr><td colspan="6">⚠️ Error loading partial grades</td></tr>`;
     }
   }
@@ -77,6 +91,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const grades = await apiFetch(`/api/grades/official/${user._id}`);
       officialBody.innerHTML = "";
+
+      if (!grades.length) {
+        officialBody.innerHTML = `<tr><td colspan="3">No official grades available.</td></tr>`;
+        return;
+      }
 
       grades.forEach(subj => {
         const remarks = subj.finalGrade >= 75 ? "PASSED" : "FAILED";
@@ -91,11 +110,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         officialBody.appendChild(tr);
       });
     } catch (err) {
+      console.error("Official grades error:", err);
       officialBody.innerHTML = `<tr><td colspan="3">⚠️ Error loading official grades</td></tr>`;
     }
   }
 
-  // 🔹 Auto-refresh every 60s (real-time feel)
+  // 🔹 Auto-refresh every 60s
   setInterval(() => {
     loadPartialGrades();
     loadOfficialGrades();
