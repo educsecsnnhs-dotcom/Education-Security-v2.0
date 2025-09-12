@@ -1,13 +1,6 @@
 // ssg-results.js
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // Access control
-  if (!["SSG", "Registrar", "SuperAdmin"].includes(user.role)) {
-    alert("Access denied: SSG/Registrar only");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["SSG". "Registrar"], { redirectTo: "/welcome.html" });
   }
 
   // UI refs
