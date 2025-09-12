@@ -1,4 +1,3 @@
-// routes/auth.js
 const express = require("express");
 const User = require("../models/User");
 const { encryptPassword, comparePassword } = require("../utils/caesar");
@@ -88,11 +87,11 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// 🔹 Logout
+// 🔹 Logout (single version kept)
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).json({ message: "Logout failed" });
-    res.clearCookie("connect.sid"); // remove session cookie
+    res.clearCookie("connect.sid"); // ✅ ensure cookie is cleared
     res.json({ message: "✅ Logged out successfully" });
   });
 });
@@ -160,7 +159,7 @@ router.post(
   }
 );
 
-// Get all users (SuperAdmin or Registrar)
+// Get all users (SuperAdmin only)
 router.get(
   "/users",
   authRequired,
