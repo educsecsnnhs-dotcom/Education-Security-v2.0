@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = Auth.getUser();
   if (user.role !== "SSG", "SuperAdmin") {
     alert("Access denied: SSG only");
-    window.location.href = "../welcome.html";
+    window.location.href = "welcome.html";
     return;
   }
 
