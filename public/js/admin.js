@@ -1,14 +1,10 @@
+// public/js/admin.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Role check using accessGuard
   checkAccess(["Admin"], { redirectTo: "/welcome.html" });
-
-  // existing admin.js logic here...
-});
-
-  }
 
   // ================= TAB SWITCHING =================
   const tabs = document.querySelectorAll(".tab-btn");
