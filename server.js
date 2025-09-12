@@ -37,6 +37,12 @@ app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section")); 
 app.use("/api/announcements", require("./routes/announcements"));
 
+// ensure uploads is served
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// register ssg routes
+app.use('/api/ssg', require('./routes/ssg'));
+
 
 // Serve frontend from "public"
 app.use(express.static(path.join(__dirname, "public")));
