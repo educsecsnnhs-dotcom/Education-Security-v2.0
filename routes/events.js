@@ -1,7 +1,7 @@
 // routes/events.js
 const express = require("express");
 const Event = require("../models/Event");
-const { authMiddleware } = require("../middleware/auth");
+const { authMiddleware } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // POST - create event
