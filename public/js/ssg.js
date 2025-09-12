@@ -1,8 +1,9 @@
+// ssg.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "SSG" && user.role !== "Admin" && user.role !== "SuperAdmin") {
+  if (!["SSG", "Admin", "SuperAdmin"].includes(user.role)) {
     alert("Access denied. SSG/Admin only.");
     window.location.href = "/welcome.html";
     return;
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     candidatesTable.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
     try {
       const data = await apiFetch("/api/ssg/candidates");
-      if (!data.length) {
+      if (!data || !data.length) {
         candidatesTable.innerHTML = `<tr><td colspan="4">No candidates yet.</td></tr>`;
         return;
       }
@@ -48,23 +49,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         candidatesTable.appendChild(tr);
       });
 
-      // Edit
+      // Edit candidate
       candidatesTable.querySelectorAll(".edit").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.dataset.id;
-          const cand = data.find(c => c._id === id);
+        btn.addEventListener("click", () => {
+          const cand = data.find(c => c._id === btn.dataset.id);
           if (!cand) return;
-
-          // Pre-fill form
           document.getElementById("candName").value = cand.name;
           document.getElementById("candPosition").value = cand.position;
           document.getElementById("candLevel").value = cand.level;
-
-          candidateForm.dataset.editing = id;
+          candidateForm.dataset.editing = cand._id;
         });
       });
 
-      // Delete
+      // Delete candidate
       candidatesTable.querySelectorAll(".delete").forEach(btn => {
         btn.addEventListener("click", async () => {
           if (!confirm("Delete this candidate?")) return;
@@ -78,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
     } catch (err) {
+      console.error(err);
       candidatesTable.innerHTML = `<tr><td colspan="4">⚠️ Error loading candidates</td></tr>`;
     }
   }
@@ -97,20 +95,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       if (candidateForm.dataset.editing) {
-        // Update
         await apiFetch(`/api/ssg/candidates/${candidateForm.dataset.editing}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
         delete candidateForm.dataset.editing;
       } else {
-        // Create
         await apiFetch("/api/ssg/candidates", {
           method: "POST",
           body: JSON.stringify(payload),
         });
       }
-
       candidateForm.reset();
       loadCandidates();
     } catch (err) {
@@ -125,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     electionsTable.innerHTML = `<tr><td colspan="3">Loading...</td></tr>`;
     try {
       const data = await apiFetch("/api/ssg/results");
-      if (!data.length) {
+      if (!data || !data.length) {
         electionsTable.innerHTML = `<tr><td colspan="3">No election data yet.</td></tr>`;
         return;
       }
@@ -140,6 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         electionsTable.appendChild(tr);
       });
     } catch (err) {
+      console.error(err);
       electionsTable.innerHTML = `<tr><td colspan="3">⚠️ Error loading results</td></tr>`;
     }
   }
@@ -151,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     officersTable.innerHTML = `<tr><td colspan="3">Loading...</td></tr>`;
     try {
       const data = await apiFetch("/api/ssg/officers");
-      if (!data.length) {
+      if (!data || !data.length) {
         officersTable.innerHTML = `<tr><td colspan="3">No officers yet.</td></tr>`;
         return;
       }
@@ -166,14 +162,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         officersTable.appendChild(tr);
       });
     } catch (err) {
+      console.error(err);
       officersTable.innerHTML = `<tr><td colspan="3">⚠️ Error loading officers</td></tr>`;
     }
   }
 
   /* ---------------- Auto-refresh ---------------- */
-  loadCandidates();
-  loadElections();
-  loadOfficers();
+  await loadCandidates();
+  await loadElections();
+  await loadOfficers();
 
   setInterval(() => {
     loadElections();
