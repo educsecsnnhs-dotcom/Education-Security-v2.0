@@ -1,6 +1,6 @@
 // ssg-results.js
 document.addEventListener("DOMContentLoaded", () => {
-  checkAccess(["SSG". "Registrar"], { redirectTo: "/welcome.html" });
+  checkAccess(["SSG", "Registrar"], { redirectTo: "/welcome.html" });
   }
 
   // UI refs
