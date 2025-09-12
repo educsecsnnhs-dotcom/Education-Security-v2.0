@@ -1,12 +1,6 @@
 // ssg.js
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  if (!["SSG", "Admin", "SuperAdmin"].includes(user.role)) {
-    alert("Access denied. SSG/Admin only.");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["SSG"], { redirectTo: "/welcome.html" });
   }
 
   /* ---------------- Tabs ---------------- */
