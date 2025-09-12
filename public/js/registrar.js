@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const user = Auth.getUser();
   if (user.role !== "Registrar" && user.role !== "SuperAdmin") {
     alert("Access denied. Registrar only.");
-    window.location.href = "welcome.html";
+    window.location.href = "/welcome.html";
     return;
   }
 
