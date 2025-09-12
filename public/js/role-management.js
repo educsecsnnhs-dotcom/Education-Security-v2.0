@@ -1,15 +1,16 @@
+// public/js/role-management.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const me = Auth.getUser();
 
-  // Only Registrar & SuperAdmin can access
+  // ✅ Only Registrar & SuperAdmin
   if (!["SuperAdmin", "Registrar"].includes(me.role)) {
-    alert("Access denied");
+    alert("❌ Access denied");
     window.location.href = "/welcome.html";
     return;
   }
 
-  // Dynamic role/extraRole dropdowns
+  // 🔹 Dropdown options
   const ROLE_OPTIONS = ["User", "Student", "Moderator", "Admin", "Registrar", "SuperAdmin"];
   const EXTRA_OPTIONS = ["SSG"];
   const BULK_ACTIONS = [
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // UI references
+  // 🔹 UI refs
   const usersTableBody = document.querySelector("#usersTable tbody");
   const globalSearch = document.getElementById("globalSearch");
   const filterRole = document.getElementById("filterRole");
@@ -72,26 +73,35 @@ document.addEventListener("DOMContentLoaded", async () => {
   let allUsers = [];
   let visibleUsers = [];
 
-  // Load metadata
+  // 🔹 Load metadata
   async function loadMeta() {
-    const [sectionsRes, strandsRes] = await Promise.all([
-      apiFetch("/api/meta/sections"),
-      apiFetch("/api/meta/strands"),
-    ]);
-    populateSelect(filterSection, ["All sections", ...(sectionsRes.sections || [])]);
-    populateSelect(filterStrand, ["All strands", ...(strandsRes.strands || [])]);
+    try {
+      const [sectionsRes, strandsRes] = await Promise.all([
+        apiFetch("/api/meta/sections"),
+        apiFetch("/api/meta/strands"),
+      ]);
+      populateSelect(filterSection, ["All sections", ...(sectionsRes.sections || [])]);
+      populateSelect(filterStrand, ["All strands", ...(strandsRes.strands || [])]);
+    } catch (err) {
+      console.error("Meta load error:", err);
+    }
   }
 
-  // Load users
+  // 🔹 Load users
   async function loadUsers() {
-    const res = await apiFetch("/api/auth/users");
-    allUsers = res.users || [];
-    visibleUsers = allUsers;
-    renderTable(visibleUsers);
-    updateStats(visibleUsers);
+    try {
+      const res = await apiFetch("/api/auth/users");
+      allUsers = res.users || [];
+      visibleUsers = allUsers;
+      renderTable(visibleUsers);
+      updateStats(visibleUsers);
+    } catch (err) {
+      console.error("User load error:", err);
+      usersTableBody.innerHTML = `<tr><td colspan="10">⚠️ Error loading users</td></tr>`;
+    }
   }
 
-  // Render table
+  // 🔹 Render table
   function renderTable(users) {
     usersTableBody.innerHTML = "";
     if (!users.length) {
@@ -131,7 +141,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           actionsCell.innerHTML += btn("Promote→Moderator", "promoteModerator");
         }
         if (u.role === "Student") {
-          actionsCell.innerHTML += btn(u.extraRoles?.includes("SSG") ? "Remove SSG" : "Add SSG", "toggleSSG");
+          actionsCell.innerHTML += btn(
+            u.extraRoles?.includes("SSG") ? "Remove SSG" : "Add SSG",
+            "toggleSSG"
+          );
         }
       }
 
@@ -156,7 +169,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     statStudents.textContent = users.filter(u => u.role==="Student").length;
   }
 
-  // Filtering
+  // 🔹 Filtering
   applyFilters.addEventListener("click", () => {
     const q = globalSearch.value.toLowerCase();
     visibleUsers = allUsers.filter(u => {
@@ -171,20 +184,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   clearFilters.addEventListener("click", () => {
-    globalSearch.value=""; filterRole.value=""; filterExtra.value=""; filterSection.value=""; filterStrand.value="";
-    visibleUsers = allUsers; renderTable(allUsers); updateStats(allUsers);
+    globalSearch.value="";
+    filterRole.value="";
+    filterExtra.value="";
+    filterSection.value="";
+    filterStrand.value="";
+    visibleUsers = allUsers;
+    renderTable(allUsers);
+    updateStats(allUsers);
   });
 
-  // Select all
+  // 🔹 Select all
   selectAll.addEventListener("change", e => {
     document.querySelectorAll(".rowCheckbox").forEach(cb => cb.checked=e.target.checked);
   });
 
-  // Export CSV
+  // 🔹 Export CSV (safe escaping)
   exportCsv.addEventListener("click", () => {
+    const escapeCsv = (val) => {
+      if (val == null) return "";
+      val = String(val);
+      return /[",\n]/.test(val) ? `"${val.replace(/"/g, '""')}"` : val;
+    };
     const rows = [
-      ["id","name","email","role","extraRoles","sections","strands"].join(","),
-      ...visibleUsers.map(u => [u._id, u.name, u.email, u.role, (u.extraRoles||[]).join("|"), (u.sections||[]).join("|"), (u.strands||[]).join("|")].join(","))
+      ["id","name","email","role","extraRoles","sections","strands"].map(escapeCsv).join(","),
+      ...visibleUsers.map(u => [
+        u._id,
+        u.name,
+        u.email,
+        u.role,
+        (u.extraRoles||[]).join("|"),
+        (u.sections||[]).join("|"),
+        (u.strands||[]).join("|")
+      ].map(escapeCsv).join(","))
     ];
     const blob = new Blob([rows.join("\n")], { type:"text/csv" });
     const a = document.createElement("a");
@@ -193,23 +225,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     a.click();
   });
 
-  // Audit modal
+  // 🔹 Audit modal
   openAudit.addEventListener("click", async () => {
-    const res = await apiFetch("/api/roles/audit");
-    auditList.innerHTML = (res.logs||[]).map(l => `<div class="audit-row">[${new Date(l.date).toLocaleString()}] ${l.by}: ${l.action} — ${JSON.stringify(l.details)}</div>`).join("");
-    auditModal.classList.remove("hidden");
+    try {
+      const res = await apiFetch("/api/roles/audit");
+      auditList.innerHTML = (res.logs||[])
+        .map(l => `<div class="audit-row">[${new Date(l.date).toLocaleString()}] ${l.by}: ${l.action} — ${JSON.stringify(l.details)}</div>`)
+        .join("") || "<div>No audit logs found</div>";
+      auditModal.classList.remove("hidden");
+    } catch (err) {
+      console.error("Audit error:", err);
+      auditList.innerHTML = "<div>⚠️ Failed to load audit logs</div>";
+      auditModal.classList.remove("hidden");
+    }
   });
   closeAudit.addEventListener("click", () => auditModal.classList.add("hidden"));
 
-  // Notifications
+  // 🔹 Notifications
   openNotif.addEventListener("click", async () => {
-    const res = await apiFetch("/api/notifications");
-    notifList.innerHTML = (res.notifications||[]).map(n => `<div class="notif-row">[${new Date(n.date).toLocaleString()}] ${n.message}</div>`).join("");
-    notifModal.classList.remove("hidden");
+    try {
+      const res = await apiFetch("/api/notifications");
+      notifList.innerHTML = (res.notifications||[])
+        .map(n => `<div class="notif-row">[${new Date(n.date).toLocaleString()}] ${n.message}</div>`)
+        .join("") || "<div>No notifications</div>";
+      notifModal.classList.remove("hidden");
+    } catch (err) {
+      console.error("Notif error:", err);
+      notifList.innerHTML = "<div>⚠️ Failed to load notifications</div>";
+      notifModal.classList.remove("hidden");
+    }
   });
   closeNotif.addEventListener("click", () => notifModal.classList.add("hidden"));
 
-  // Init
+  // 🔹 Init
   await loadMeta();
   await loadUsers();
 });
