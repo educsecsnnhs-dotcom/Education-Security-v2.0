@@ -1,6 +1,10 @@
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Admin", "Registrar", "SSG"], { redirectTo: "/welcome.html" });
+
   Auth.requireLogin();
   const user = Auth.getUser();
+
+  // announcements logic...
 
   const schoolSection = document.getElementById("school");
   const deptSection = document.getElementById("department");
