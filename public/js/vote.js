@@ -1,13 +1,6 @@
 // public/js/vote.js
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Correct role check
-  if (!["Student", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. Students only.");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Student"], { redirectTo: "/welcome.html" });
   }
 
   // Elements (make sure vote.html contains these IDs)
