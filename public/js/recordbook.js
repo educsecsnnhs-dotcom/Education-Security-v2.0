@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "Moderator") {
+  if (user.role !== "Moderator", "SuperAdmin") {
     alert("Access denied. Teachers only.");
     window.location.href = "welcome.html";
     return;
