@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         { name: "Enrollee", link: "pages/registrar.html", icon: "🧾" },
         { name: "Enrolled", link: "pages/enrolled.html", icon: "✅" },
         { name: "Archives", link: "pages/archives.html", icon: "📂" },
-        { name: "Role Management", link: "pages/roles.html", icon: "👥" },
+        { name: "Role Management", link: "pages/role-management.html", icon: "👥" },
         { name: "Announcements", link: "pages/announcements.html", icon: "📢" }, 
       ],
       Admin: [
