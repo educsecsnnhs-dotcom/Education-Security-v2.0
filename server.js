@@ -59,7 +59,6 @@ app.use("/api/recordbook", require("./routes/recordbook"));
 app.use("/api/ssg", require("./routes/ssg"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/principal", require("./routes/principal"));
-app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section"));
