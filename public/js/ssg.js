@@ -1,6 +1,6 @@
 // ssg.js
 document.addEventListener("DOMContentLoaded", () => {
-  checkAccess(["SSG"], { redirectTo: "/welcome.html" });
+  checkAccess(["SSG", "Registrar"], { redirectTo: "/welcome.html" });
   }
 
   /* ---------------- Tabs ---------------- */
