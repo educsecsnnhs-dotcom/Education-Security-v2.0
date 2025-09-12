@@ -7,12 +7,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const sectionSection = document.getElementById("section");
   const newAnnouncementBtn = document.getElementById("newAnnouncementBtn");
 
-  // 🔹 Role-based posting rights
-  const canPostSchool = ["SSG", "Registrar"].includes(user.role);
-  const canPostDept = ["Admin", "Moderator"].includes(user.role);
-  const canPostSection = ["Moderator"].includes(user.role);
+  // 🔹 Helper: allow SuperAdmin always
+  function canPost(scope) {
+    if (user.role === "SuperAdmin") return true;
+    if (scope === "school") return ["SSG", "Registrar"].includes(user.role);
+    if (scope === "department") return ["Admin", "Moderator"].includes(user.role);
+    if (scope === "section") return ["Moderator"].includes(user.role);
+    return false;
+  }
 
-  if (canPostSchool || canPostDept || canPostSection) {
+  // 🔹 Enable button if user can post to at least one scope
+  if (["school", "department", "section"].some(canPost)) {
     newAnnouncementBtn.style.display = "inline-block";
   }
 
@@ -89,11 +94,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("announcementForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const scope = scopeSelect.value;
+    if (!canPost(scope)) {
+      alert("❌ You don’t have permission to post here.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", document.getElementById("title").value);
     formData.append("content", document.getElementById("content").value);
-    formData.append("scope", scopeSelect.value);
-    if (scopeSelect.value !== "school") {
+    formData.append("scope", scope);
+    if (scope !== "school") {
       formData.append("target", targetInput.value);
     }
     if (document.getElementById("image").files[0]) {
