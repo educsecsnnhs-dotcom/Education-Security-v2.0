@@ -11,23 +11,25 @@ const MongoStore = require("connect-mongo");
 // Routes
 const announcementsRoute = require("./routes/announcement");
 const eventsRoute = require("./routes/events");
-// ❌ removed reportsRoute
 
 dotenv.config();
 
 const app = express();
 
-// Middleware
+// ✅ CORS (frontend + backend same Render domain)
 app.use(
   cors({
-    origin: true, // or ["http://localhost:3000"]
-    credentials: true,
+    origin: ["https://education-security-v2-0.onrender.com"], // your deployed frontend
+    credentials: true, // ✅ allow cookies
   })
 );
+
+// Middleware
 app.use(express.json());
 app.use(morgan("dev"));
 
 // ✅ Sessions
+app.set("trust proxy", 1); // ✅ trust Render's proxy so secure cookies work
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "supersecretkey",
@@ -39,7 +41,8 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true, // ✅ only send cookie over HTTPS
+      sameSite: "none", // ✅ required for cross-origin cookies
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
