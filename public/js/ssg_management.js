@@ -1,13 +1,6 @@
 // public/js/ssg-events.js
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Correct role check
-  if (!["SSG", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. SSG only.");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["SSG". "Registrar"], { redirectTo: "/welcome.html" });
   }
 
   const form = document.getElementById("eventForm");
