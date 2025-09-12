@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Only Registrar & SuperAdmin can access
   if (!["SuperAdmin", "Registrar"].includes(me.role)) {
     alert("Access denied");
-    window.location.href = "welcome.html";
+    window.location.href = "/welcome.html";
     return;
   }
 
