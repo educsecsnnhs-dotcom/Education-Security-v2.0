@@ -3,7 +3,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = Auth.getUser();
 
   // ✅ Allow Admin OR SuperAdmin
-  checkAccess(["Admin"]);
+  if (!["Admin", "SuperAdmin"].includes(user.role)) {
+    alert("Access denied: Admins only");
+    window.location.href = "/welcome.html";
+    return;
+  }
 
   // ================= TAB SWITCHING =================
   const tabs = document.querySelectorAll(".tab-btn");
