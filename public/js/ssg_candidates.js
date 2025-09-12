@@ -1,6 +1,6 @@
 // ssg-registrar-candidates.js
 document.addEventListener("DOMContentLoaded", () => {
-  checkAccess(["SSG". "Registrar"], { redirectTo: "/welcome.html" });
+  checkAccess(["SSG", "Registrar"], { redirectTo: "/welcome.html" });
   }
 
   const form = document.getElementById("candidateForm");
