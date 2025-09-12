@@ -1,13 +1,6 @@
 // public/js/role-management.js
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const me = Auth.getUser();
-
-  // ✅ Only Registrar & SuperAdmin
-  if (!["SuperAdmin", "Registrar"].includes(me.role)) {
-    alert("❌ Access denied");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
   }
 
   // 🔹 Dropdown options
