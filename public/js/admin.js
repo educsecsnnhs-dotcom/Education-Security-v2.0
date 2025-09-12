@@ -2,11 +2,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "Admin", "SuperAdmin") {
-    alert("Access denied. Admins only.");
-    window.location.href = "/welcome.html";
-    return;
-  }
+  // ✅ Allow Admin OR SuperAdmin
+  checkAccess(["Admin"]);
 
   // ================= TAB SWITCHING =================
   const tabs = document.querySelectorAll(".tab-btn");
