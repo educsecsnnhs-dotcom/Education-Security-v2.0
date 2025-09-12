@@ -11,21 +11,23 @@ const MongoStore = require("connect-mongo");
 // Routes
 const announcementsRoute = require("./routes/announcement");
 const eventsRoute = require("./routes/events");
-const reportsRoute = require("./routes/reports");
+// ❌ removed reportsRoute
 
 dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: true, // or ["http://localhost:3000"]
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: true, // or ["http://localhost:3000"]
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(morgan("dev"));
 
-// ✅ Sessions (only once)
+// ✅ Sessions
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "supersecretkey",
@@ -63,7 +65,6 @@ app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section"));
 app.use("/api/announcements", announcementsRoute);
 app.use("/api/events", eventsRoute);
-app.use("/api/reports", reportsRoute);
 
 // Ensure uploads dir exists
 if (!fs.existsSync("uploads/announcements")) {
