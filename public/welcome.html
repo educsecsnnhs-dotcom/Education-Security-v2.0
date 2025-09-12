@@ -10,19 +10,144 @@
   <script defer src="js/script.js"></script>
   <script defer src="js/menu.js"></script>
   <script defer src="js/welcome.js"></script>
+
+  <style>
+    /* Layout */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 220px;
+      right: 0;
+      height: 60px;
+      background: #1e3a8a; /* dark blue */
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .clock {
+      font-size: 1rem;
+    }
+
+    .logout {
+      background: #ef4444;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .logout:hover {
+      background: #dc2626;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 220px;
+      background: #3b82f6; /* lighter blue */
+      padding: 80px 10px 20px; /* push down to below header */
+      overflow-y: auto;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar .menu-link {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .sidebar .menu-link:hover {
+      background: #2563eb;
+    }
+
+    .sidebar .icon {
+      margin-right: 8px;
+    }
+
+    /* Main */
+    main {
+      margin-left: 220px;
+      margin-top: 60px;
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+      background: #f3f4f6; /* light gray */
+    }
+
+    .user-info {
+      background: #ecfdf5;
+      border: 1px solid #d1fae5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .pdf-viewer embed {
+      width: 100%;
+      height: 500px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <ul id="menuList"></ul>
+  </nav>
+
   <!-- Top bar -->
   <header>
     <h1 class="title">SNNHS SCHOOL PORTAL</h1>
     <div class="clock" id="clock">--:--:--</div>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
-
-  <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
-    <ul id="menuList"></ul>
-  </nav>
 
   <!-- Main Content -->
   <main>
@@ -45,31 +170,28 @@
     <section class="card">
       <h2>🏫 School Info</h2>
       <div class="pdf-viewer">
-        <embed src="school-info.pdf" type="application/pdf" width="100%" height="500px" />
+        <embed src="school-info.pdf" type="application/pdf" />
       </div>
     </section>
   </main>
 
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      // ✅ Check session and fetch user
       try {
         const res = await fetch("/api/auth/me", { credentials: "include" });
         if (!res.ok) {
-          window.location.href = "login.html"; // not logged in
+          window.location.href = "login.html";
           return;
         }
-        const user = await res.json();
+        const { user } = await res.json();
 
-        // ✅ Fill UI with session data
-        document.getElementById("userName").textContent = user.username;
+        document.getElementById("userName").textContent = user.email;
         document.getElementById("userRole").textContent = user.role;
       } catch (err) {
         console.error("Session check failed:", err);
         window.location.href = "login.html";
       }
 
-      // Live Clock + Date (Philippines Timezone)
       function updateClock() {
         const now = new Date();
         const optionsTime = { hour12: false, timeZone: "Asia/Manila" };
@@ -83,7 +205,6 @@
       setInterval(updateClock, 1000);
       updateClock();
 
-      // ✅ Logout button
       document.getElementById("logoutBtn").addEventListener("click", async () => {
         await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         window.location.href = "login.html";
