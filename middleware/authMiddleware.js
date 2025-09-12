@@ -20,8 +20,8 @@ const roleMap = {
  * Normalize a role string
  */
 const normalizeRole = (role) => {
-  if (!role) return role;
-  const key = role.toLowerCase();
+  if (!role) return null;
+  const key = role.toString().toLowerCase();
   return roleMap[key] || role;
 };
 
@@ -32,9 +32,9 @@ const authRequired = (req, res, next) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ message: "Not logged in" });
   }
-  req.user = req.session.user;
 
-  // ✅ Normalize main role + extra roles
+  // ✅ Normalize roles
+  req.user = req.session.user;
   req.user.role = normalizeRole(req.user.role);
   if (Array.isArray(req.user.extraRoles)) {
     req.user.extraRoles = req.user.extraRoles.map(normalizeRole);
@@ -47,20 +47,20 @@ const authRequired = (req, res, next) => {
  * Restrict access by single role
  */
 const requireRole = (role) => {
+  const normalizedRole = normalizeRole(role);
+
   return (req, res, next) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
     const { role: userRole, extraRoles = [] } = req.user;
 
-    // ✅ SuperAdmin bypass
-    if (userRole === "SuperAdmin") {
-      return next();
-    }
+    // ✅ SuperAdmin = God mode
+    if (userRole === "SuperAdmin") return next();
 
-    if (userRole !== role && !extraRoles.includes(role)) {
-      return res.status(403).json({ message: `Requires role: ${role}` });
+    if (userRole !== normalizedRole && !extraRoles.includes(normalizedRole)) {
+      return res.status(403).json({ message: `Requires role: ${normalizedRole}` });
     }
 
     next();
@@ -71,22 +71,22 @@ const requireRole = (role) => {
  * Allow multiple roles
  */
 const requireAnyRole = (roles = []) => {
+  const normalizedRoles = roles.map(normalizeRole);
+
   return (req, res, next) => {
-    if (!req.session || !req.session.user) {
+    if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
     const { role: userRole, extraRoles = [] } = req.user;
 
-    // ✅ SuperAdmin bypass
-    if (userRole === "SuperAdmin") {
-      return next();
-    }
+    // ✅ SuperAdmin = God mode
+    if (userRole === "SuperAdmin") return next();
 
-    if (![userRole, ...extraRoles].some((r) => roles.includes(r))) {
+    if (![userRole, ...extraRoles].some((r) => normalizedRoles.includes(r))) {
       return res
         .status(403)
-        .json({ message: `Requires one of: ${roles.join(", ")}` });
+        .json({ message: `Requires one of: ${normalizedRoles.join(", ")}` });
     }
 
     next();
