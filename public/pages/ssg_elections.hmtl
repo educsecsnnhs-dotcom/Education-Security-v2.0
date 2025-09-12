@@ -16,7 +16,7 @@
 
   <main>
     <section class="card">
-      <div>
+      <div style="display:flex;gap:8px;align-items:center;">
         <label>Scope:
           <select id="scope">
             <option value="school">School-wide</option>
