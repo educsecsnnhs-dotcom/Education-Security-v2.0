@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const form = document.getElementById("candidateForm");
   const list = document.getElementById("candidatesList");
+
   const loadCandidates = async () => {
     list.innerHTML = "Loading...";
     try {
@@ -19,12 +20,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const d = document.createElement("div");
         d.className = "candidate-card";
         d.innerHTML = `
-          <img src="${c.photoUrl || '/images/avatar.png'}" alt="" style="width:64px;height:64px;border-radius:6px;object-fit:cover;margin-right:10px;">
-          <strong>${c.name}</strong> — ${c.position}
-          <div>Scope: ${c.scope}${c.target ? " / "+c.target : ""}</div>
-          <div style="margin-top:6px;">
-            <button class="edit" data-id="${c._id}">Edit</button>
-            <button class="del" data-id="${c._id}">Delete</button>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <img src="${c.photoUrl || '/images/avatar.png'}" alt="" style="width:64px;height:64px;border-radius:6px;object-fit:cover;">
+            <div style="flex:1;">
+              <strong>${c.name}</strong> — ${c.position}
+              <div>Scope: ${c.scope}${c.target ? " / "+c.target : ""}</div>
+            </div>
+            <div>
+              <button class="edit" data-id="${c._id}">Edit</button>
+              <button class="del" data-id="${c._id}">Delete</button>
+            </div>
           </div>
         `;
         list.appendChild(d);
@@ -67,7 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (e.target.classList.contains("edit")) {
       const id = e.target.dataset.id;
-      // quick edit prompt (for speed). You can replace with modal.
       const name = prompt("New name?");
       if (!name) return;
       try {
