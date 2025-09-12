@@ -9,7 +9,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
 // Routes
-const announcementsRoute = require("./routes/announcement"); // ✅ singular filename
+const announcementsRoute = require("./routes/announcement");
 const eventsRoute = require("./routes/events");
 const reportsRoute = require("./routes/reports");
 
@@ -19,13 +19,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: true, // or set specific frontend URL: ["http://localhost:3000"]
-  credentials: true, // ✅ allow cookies
+  origin: true, // or ["http://localhost:3000"]
+  credentials: true,
 }));
 app.use(express.json());
 app.use(morgan("dev"));
 
-// ✅ Sessions
+// ✅ Sessions (only once)
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "supersecretkey",
@@ -37,7 +37,7 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ true if https
+      secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
@@ -60,12 +60,12 @@ app.use("/api/principal", require("./routes/principal"));
 app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/attendance", require("./routes/attendance"));
-app.use("/api/sections", require("./routes/section")); 
+app.use("/api/sections", require("./routes/section"));
 app.use("/api/announcements", announcementsRoute);
 app.use("/api/events", eventsRoute);
 app.use("/api/reports", reportsRoute);
 
-// ensure uploads dir exists
+// Ensure uploads dir exists
 if (!fs.existsSync("uploads/announcements")) {
   fs.mkdirSync("uploads/announcements", { recursive: true });
 }
