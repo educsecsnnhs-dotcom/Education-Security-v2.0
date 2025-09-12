@@ -4,7 +4,6 @@ const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
-const path = require("path");
 const fs = require("fs");
 
 dotenv.config();
@@ -37,12 +36,12 @@ app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section")); 
 app.use("/api/announcements", require("./routes/announcements"));
 
-// ensure uploads is served
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ensure uploads dir exists and serve it
+if (!fs.existsSync("uploads")) fs.mkdirSync("uploads", { recursive: true });
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// register ssg routes
-app.use('/api/ssg', require('./routes/ssg'));
-
+// register ssg routes (after auth middleware is loaded)
+app.use("/api/ssg", require("./routes/ssg"));
 
 // Serve frontend from "public"
 app.use(express.static(path.join(__dirname, "public")));
