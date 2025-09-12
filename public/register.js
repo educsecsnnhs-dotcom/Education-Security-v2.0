@@ -1,24 +1,17 @@
+// public/js/register.js
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
-  const passwordInput = document.getElementById("password");
-  const togglePassword = document.getElementById("togglePassword");
+  if (!form) return;
 
-  // Toggle password visibility
-  togglePassword.addEventListener("click", () => {
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
-    togglePassword.textContent = type === "password" ? "👁️" : "🙈";
-  });
-
-  // Handle register
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const username = document.getElementById("username").value.trim();
     const email = document.getElementById("email").value.trim();
-    const password = passwordInput.value.trim();
+    const password = document.getElementById("password").value.trim();
 
-    if (!email || !password) {
-      alert("⚠️ Email and password are required");
+    if (!username || !email || !password) {
+      alert("Please fill in all fields");
       return;
     }
 
@@ -26,20 +19,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        credentials: "include", // ✅ ensure session cookie
+        body: JSON.stringify({ username, email, password }),
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        alert("❌ " + (data.message || "Registration failed"));
-        return;
+        const errorText = await res.text();
+        throw new Error(errorText || "Registration failed");
       }
 
-      alert("✅ Registration successful!");
+      alert("✅ Registration successful! Please log in.");
       window.location.href = "login.html";
     } catch (err) {
-      console.error("Register error:", err);
-      alert("❌ Network error. Try again.");
+      console.error("Registration error:", err);
+      alert("❌ " + err.message);
     }
   });
 });
