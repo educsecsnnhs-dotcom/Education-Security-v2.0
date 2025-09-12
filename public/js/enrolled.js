@@ -2,6 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
+  // ✅ Only Registrar or SuperAdmin can access
+  if (!["Registrar", "SuperAdmin"].includes(user.role)) {
+    alert("❌ Access denied. Enrollment is for Registrar only.");
+    window.location.href = "/welcome.html";
+    return;
+  }
+
   const enrolledTable = document.getElementById("enrolledTable");
   const searchName = document.getElementById("searchName");
   const filterGrade = document.getElementById("filterGrade");
