@@ -27,29 +27,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       const records = await apiFetch(`/api/attendance/${user._id}`);
       attendanceBody.innerHTML = "";
 
-      if (!records.length) {
+      if (!records || records.length === 0) {
         attendanceBody.innerHTML = `<tr><td colspan="3">No attendance records found.</td></tr>`;
+      } else {
+        records.forEach(rec => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${new Date(rec.date).toLocaleDateString()}</td>
+            <td class="${rec.status.toLowerCase()}">${rec.status}</td>
+            <td>${rec.remarks || "-"}</td>
+          `;
+          attendanceBody.appendChild(tr);
+        });
       }
-
-      records.forEach(rec => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${new Date(rec.date).toLocaleDateString()}</td>
-          <td class="${rec.status.toLowerCase()}">${rec.status}</td>
-          <td>${rec.remarks || "-"}</td>
-        `;
-        attendanceBody.appendChild(tr);
-      });
 
       lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
     } catch (err) {
+      console.error("Attendance load failed:", err);
       attendanceBody.innerHTML = `<tr><td colspan="3">⚠️ Error loading attendance</td></tr>`;
+      lastUpdated.textContent = `Last attempted: ${new Date().toLocaleTimeString()}`;
     }
   }
 
   // 🔹 Auto-refresh every 60s
   setInterval(loadAttendance, 60000);
 
-  // First load
+  // 🔹 First load
   await loadAttendance();
 });
