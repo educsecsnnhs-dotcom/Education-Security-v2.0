@@ -19,12 +19,24 @@ exports.promoteUser = async (req, res) => {
     const { userId, role } = req.body;
     const actingUser = req.user;
 
-    // Permissions
-    if (actingUser.role === "Registrar" && !["Student"].includes(role)) {
-      return res.status(403).json({ message: "Registrar can only promote to Student" });
+    // 🔒 Block Student promotions (handled by enrollment flow)
+    if (role === "Student") {
+      return res.status(403).json({ message: "Students can only be created via enrollment approval" });
     }
-    if (actingUser.role === "SuperAdmin" && !["Registrar", "Admin", "Moderator"].includes(role)) {
-      return res.status(403).json({ message: "SuperAdmin can only promote to Registrar, Admin, or Moderator" });
+
+    // Registrar rules
+    if (actingUser.role === "Registrar") {
+      if (!["Moderator", "Admin"].includes(role)) {
+        return res.status(403).json({ message: "Registrar can only promote to Moderator or Admin" });
+      }
+    }
+
+    // SuperAdmin rules
+    if (actingUser.role === "SuperAdmin") {
+      // Allow promoting to Registrar, Admin, Moderator, or demoting to User
+      if (!["Registrar", "Admin", "Moderator", "User"].includes(role)) {
+        return res.status(403).json({ message: "SuperAdmin can only assign Registrar, Admin, Moderator, or User" });
+      }
     }
 
     const targetUser = await User.findById(userId);
@@ -46,6 +58,11 @@ exports.toggleSSG = async (req, res) => {
   try {
     const { userId } = req.body;
     const actingUser = req.user;
+
+    // Only Registrar or SuperAdmin can toggle SSG
+    if (!["Registrar", "SuperAdmin"].includes(actingUser.role)) {
+      return res.status(403).json({ message: "Not authorized to toggle SSG role" });
+    }
 
     const targetUser = await User.findById(userId);
     if (!targetUser) return res.status(404).json({ message: "User not found" });
