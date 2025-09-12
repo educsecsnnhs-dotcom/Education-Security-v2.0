@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  // Only Registrar or SuperAdmin can access
-  if (!["Registrar", "SuperAdmin"].includes(user.role)) {
+  // ✅ Registrar & SuperAdmin = full access
+  // ✅ SSG = read-only (no approve/reject)
+  if (!["Registrar", "SuperAdmin", "SSG"].includes(user.role)) {
     alert("❌ Access denied");
     window.location.href = "/welcome.html";
     return;
@@ -90,10 +91,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
           </ul>
 
-          <div class="actions">
-            <button class="approve-btn" data-id="${enrollee._id}">✅ Approve</button>
-            <button class="reject-btn" data-id="${enrollee._id}">❌ Reject</button>
-          </div>
+          ${
+            // Only Registrar + SuperAdmin see action buttons
+            ["Registrar", "SuperAdmin"].includes(user.role)
+              ? `
+                <div class="actions">
+                  <button class="approve-btn" data-id="${enrollee._id}">✅ Approve</button>
+                  <button class="reject-btn" data-id="${enrollee._id}">❌ Reject</button>
+                </div>
+              `
+              : ""
+          }
         </div>
       `;
 
@@ -128,20 +136,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   applyFiltersBtn.addEventListener("click", applyFilters);
 
-  // Approve/Reject buttons
+  // Approve/Reject (only if role allows)
   enrolleeList.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("approve-btn")) {
-      const id = e.target.dataset.id;
-      if (confirm("✅ Approve this enrollee?")) {
-        await apiFetch(`/api/enrollment/${id}/approve`, { method: "POST" });
-        loadEnrollees();
+    if (["Registrar", "SuperAdmin"].includes(user.role)) {
+      if (e.target.classList.contains("approve-btn")) {
+        const id = e.target.dataset.id;
+        if (confirm("✅ Approve this enrollee?")) {
+          await apiFetch(`/api/enrollment/${id}/approve`, { method: "POST" });
+          loadEnrollees();
+        }
       }
-    }
-    if (e.target.classList.contains("reject-btn")) {
-      const id = e.target.dataset.id;
-      if (confirm("❌ Reject this enrollee?")) {
-        await apiFetch(`/api/enrollment/${id}/reject`, { method: "POST" });
-        loadEnrollees();
+      if (e.target.classList.contains("reject-btn")) {
+        const id = e.target.dataset.id;
+        if (confirm("❌ Reject this enrollee?")) {
+          await apiFetch(`/api/enrollment/${id}/reject`, { method: "POST" });
+          loadEnrollees();
+        }
       }
     }
   });
