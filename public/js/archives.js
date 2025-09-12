@@ -2,8 +2,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  // Only Registrar or SuperAdmin can access
-  if (!["Registrar", "SuperAdmin"].includes(user.role)) {
+  // 🔹 Access helper: SuperAdmin always allowed
+  function canAccessArchive(role) {
+    if (role === "SuperAdmin") return true;
+    return role === "Registrar"; // only Registrar otherwise
+  }
+
+  if (!canAccessArchive(user.role)) {
     alert("❌ Access denied");
     window.location.href = "/welcome.html";
     return;
