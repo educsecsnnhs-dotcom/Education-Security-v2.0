@@ -11,6 +11,8 @@ const router = express.Router();
  * Auth (Register / Login / Logout)
  * =====================
  */
+
+// 🔹 Register
 router.post("/register", async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -50,6 +52,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// 🔹 Login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -67,14 +70,17 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // ✅ Save user to session
+    req.session.user = {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      extraRoles: user.extraRoles,
+    };
+
     res.json({
       message: "✅ Login successful",
-      user: {
-        id: user._id,
-        email: user.email,
-        role: user.role,
-        extraRoles: user.extraRoles,
-      },
+      user: req.session.user,
     });
   } catch (err) {
     console.error("❌ Login error:", err);
@@ -82,8 +88,21 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// 🔹 Logout
 router.post("/logout", (req, res) => {
-  res.json({ message: "✅ Logged out successfully" });
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ message: "Logout failed" });
+    res.clearCookie("connect.sid"); // remove session cookie
+    res.json({ message: "✅ Logged out successfully" });
+  });
+});
+
+// 🔹 Who am I? (session check)
+router.get("/me", (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ message: "Not logged in" });
+  }
+  res.json({ user: req.session.user });
 });
 
 /**
@@ -142,15 +161,20 @@ router.post(
 );
 
 // Get all users (SuperAdmin or Registrar)
-router.get("/users", async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    res.json({ users });
-  } catch (err) {
-    console.error("❌ Fetch users error:", err);
-    res.status(500).json({ message: "Server error" });
+router.get(
+  "/users",
+  authRequired,
+  requireRole("SuperAdmin"),
+  async (req, res) => {
+    try {
+      const users = await User.find().select("-password");
+      res.json({ users });
+    } catch (err) {
+      console.error("❌ Fetch users error:", err);
+      res.status(500).json({ message: "Server error" });
+    }
   }
-});
+);
 
 // Registrar → assign/remove SSG role
 router.post(
