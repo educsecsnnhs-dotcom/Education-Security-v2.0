@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SSG - Candidates</title>
+  <link rel="stylesheet" href="../style.css" />
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/ssg_candidates.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='../welcome.html'">⬅ Back</button>
+    <h1>👥 Candidate Management</h1>
+    <button onclick="Auth.logout()" class="logout">Logout</button>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Add Candidate</h2>
+      <form id="candidateForm" enctype="multipart/form-data">
+        <input type="text" id="name" placeholder="Full name" required />
+        <input type="text" id="position" placeholder="Position (President, VP...)" required />
+        <select id="scope">
+          <option value="school">School-wide</option>
+          <option value="grade">Grade-level</option>
+          <option value="section">Section</option>
+        </select>
+        <input type="text" id="target" placeholder="Target (grade or section if not school)" />
+        <input type="file" id="photo" accept="image/*" />
+        <button type="submit">Create Candidate</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Existing Candidates</h2>
+      <div id="candidatesList">Loading...</div>
+    </section>
+  </main>
+</body>
+</html>
