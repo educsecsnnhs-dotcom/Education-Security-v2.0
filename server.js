@@ -5,6 +5,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 // Routes
 const announcementsRoute = require("./routes/announcement"); // ✅ singular filename
@@ -16,9 +18,30 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true, // or set specific frontend URL: ["http://localhost:3000"]
+  credentials: true, // ✅ allow cookies
+}));
 app.use(express.json());
 app.use(morgan("dev"));
+
+// ✅ Sessions
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "supersecretkey",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // ✅ true if https
+      maxAge: 1000 * 60 * 60 * 2, // 2 hours
+    },
+  })
+);
 
 // MongoDB connection
 const connectDB = require("./config/db");
@@ -38,7 +61,7 @@ app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section")); 
-app.use("/api/announcements", announcementsRoute); // ✅ only once
+app.use("/api/announcements", announcementsRoute);
 app.use("/api/events", eventsRoute);
 app.use("/api/reports", reportsRoute);
 
