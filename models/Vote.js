@@ -2,23 +2,13 @@
 const mongoose = require("mongoose");
 
 const voteSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  level: { type: String, enum: ["school-wide", "grade", "section"], required: true },
-  section: { type: String }, // only required if level = section
-  positions: [
-    {
-      position: String,
-      candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    },
-  ],
-  votes: [
-    {
-      voter: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      position: String,
-      candidate: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    },
-  ],
-  active: { type: Boolean, default: true },
+  voterId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  candidateId: { type: mongoose.Schema.Types.ObjectId, ref: "SSGCandidate", required: true },
+  scope: { type: String, enum: ["school","grade","section"], required: true },
+  target: { type: String, default: null }, // grade or section if scope != school
+  createdAt: { type: Date, default: Date.now }
 });
 
+// ensure one vote per voter per scope+target+position: we enforce at app level (and can add compound unique index if needed per position)
 module.exports = mongoose.model("Vote", voteSchema);
+;
