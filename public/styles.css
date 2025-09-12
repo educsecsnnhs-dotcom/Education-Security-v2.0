@@ -1241,3 +1241,64 @@ td.late {
   background: #dc3545;
   color: #fff;
 }
+
+/* ===== Admin Dashboard ===== */
+.admin-dashboard {
+  padding: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  padding: 8px 15px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.tab-btn.active {
+  background: #007bff;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+#announcementForm textarea,
+#eventForm textarea {
+  width: 100%;
+  min-height: 80px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+#announcementForm button,
+#eventForm button {
+  padding: 8px 15px;
+  border: none;
+  background: #28a745;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#announcementList li,
+#eventList li {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.report-section {
+  margin-bottom: 20px;
+}
