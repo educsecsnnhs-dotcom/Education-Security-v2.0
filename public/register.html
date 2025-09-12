@@ -5,33 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register</title>
   <link rel="stylesheet" href="/styles.css" />
-  <style>
-    /* Ensures toggle stays inside input */
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
-
-    .password-wrapper input {
-      width: 100%;
-      padding-right: 40px; /* space for the toggle */
-    }
-
-    .password-wrapper .toggle-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      line-height: 1;
-      padding: 0;
-    }
-  </style>
 </head>
 <body>
   <div class="form-container">
@@ -55,8 +28,8 @@
     <p>Already have an account? <a href="login.html">Login here</a></p>
   </div>
 
-  <!-- ✅ Centralized session-based auth -->
-  <script src="js/auth.js"></script>
+  <!-- ✅ Session-based auth -->
+  <script src="js/register.js"></script>
   <script>
     // Password toggle logic
     document.addEventListener("DOMContentLoaded", () => {
@@ -64,7 +37,8 @@
       const password = document.getElementById("password");
 
       toggle.addEventListener("click", () => {
-        const type = password.getAttribute("type") === "password" ? "text" : "password";
+        const type =
+          password.getAttribute("type") === "password" ? "text" : "password";
         password.setAttribute("type", type);
         toggle.textContent = type === "password" ? "👁️" : "🙈";
       });
