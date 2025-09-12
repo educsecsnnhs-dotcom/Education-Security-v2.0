@@ -2,11 +2,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  // ✅ Allow Admin OR SuperAdmin
-  if (!["Admin", "SuperAdmin"].includes(user.role)) {
-    alert("Access denied: Admins only");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Admin"], { redirectTo: "/welcome.html" });
+
+  // existing admin.js logic here...
+});
+
   }
 
   // ================= TAB SWITCHING =================
