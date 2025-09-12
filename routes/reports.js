@@ -1,6 +1,6 @@
 // routes/reports.js
 const express = require("express");
-const { authMiddleware } = require("../middleware/auth");
+const { authMiddleware } = require("../middleware/authMiddleware");
 const User = require("../models/User");
 const Attendance = require("../models/Attendance");
 const Grade = require("../models/Grade");
