@@ -1,12 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Only Registrar or SuperAdmin can access
-  if (!["Registrar", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. Enrollment is for Registrar only.");
-    window.location.href = "/welcome.html";
-    return;
+  checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
   }
 
   const enrolledTable = document.getElementById("enrolledTable");
