@@ -5,6 +5,10 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
+const announcementsRoute = require("./routes/announcements");
+const eventsRoute = require("./routes/events");
+const reportsRoute = require("./routes/reports");
+
 
 dotenv.config();
 
@@ -35,6 +39,9 @@ app.use("/api/announcements", require("./routes/announcement"));
 app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section")); 
 app.use("/api/announcements", require("./routes/announcements"));
+app.use("/api/announcements", announcementsRoute);
+app.use("/api/events", eventsRoute);
+app.use("/api/reports", reportsRoute);
 
 // ensure uploads dir exists and serve it
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads", { recursive: true });
