@@ -5,7 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
-const announcementsRoute = require("./routes/announcements");
+const announcementsRoute = require("./routes/announcement");
 const eventsRoute = require("./routes/events");
 const reportsRoute = require("./routes/reports");
 
