@@ -1,12 +1,5 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Allow only Student & SuperAdmin
-  if (!["Student", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. Students only.");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Student"], { redirectTo: "/welcome.html" });
   }
 
   const nameEl = document.getElementById("studentName");
