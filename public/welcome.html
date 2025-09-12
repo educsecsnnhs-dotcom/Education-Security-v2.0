@@ -51,23 +51,44 @@
   </main>
 
   <script>
-    // Live Clock + Date (Philippines Timezone)
-    function updateClock() {
-      const now = new Date();
-      const optionsTime = { hour12: false, timeZone: "Asia/Manila" };
-      const optionsDate = { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Manila" };
+    document.addEventListener("DOMContentLoaded", async () => {
+      // ✅ Check session and fetch user
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) {
+          window.location.href = "login.html"; // not logged in
+          return;
+        }
+        const user = await res.json();
 
-      document.getElementById("clock").textContent =
-        now.toLocaleTimeString("en-PH", optionsTime);
-      document.getElementById("todayDate").textContent =
-        "Today is " + now.toLocaleDateString("en-PH", optionsDate);
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+        // ✅ Fill UI with session data
+        document.getElementById("userName").textContent = user.username;
+        document.getElementById("userRole").textContent = user.role;
+      } catch (err) {
+        console.error("Session check failed:", err);
+        window.location.href = "login.html";
+      }
 
-    // Example placeholders (replace with session data)
-    document.getElementById("userName").textContent = "SuperAdmin";
-    document.getElementById("userRole").textContent = "Administrator";
+      // Live Clock + Date (Philippines Timezone)
+      function updateClock() {
+        const now = new Date();
+        const optionsTime = { hour12: false, timeZone: "Asia/Manila" };
+        const optionsDate = { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Manila" };
+
+        document.getElementById("clock").textContent =
+          now.toLocaleTimeString("en-PH", optionsTime);
+        document.getElementById("todayDate").textContent =
+          "Today is " + now.toLocaleDateString("en-PH", optionsDate);
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      // ✅ Logout button
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+        window.location.href = "login.html";
+      });
+    });
   </script>
 </body>
 </html>
