@@ -1,24 +1,16 @@
+// public/js/login.js
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
-  const passwordInput = document.getElementById("password");
-  const togglePassword = document.getElementById("togglePassword");
+  if (!form) return;
 
-  // Toggle password visibility
-  togglePassword.addEventListener("click", () => {
-    const type = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = type;
-    togglePassword.textContent = type === "password" ? "👁️" : "🙈";
-  });
-
-  // Handle login
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const email = document.getElementById("email").value.trim();
-    const password = passwordInput.value.trim();
+    const password = document.getElementById("password").value.trim();
 
     if (!email || !password) {
-      alert("⚠️ Email and password are required");
+      alert("Please enter email and password");
       return;
     }
 
@@ -26,23 +18,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ session cookie
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        alert("❌ " + (data.message || "Login failed"));
-        return;
+        const errorText = await res.text();
+        throw new Error(errorText || "Login failed");
       }
 
-      // Save user info in localStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      alert("✅ Login successful!");
-      window.location.href = "welcome.html"; // or dashboard
+      // ✅ Session stored, redirect
+      window.location.href = "welcome.html";
     } catch (err) {
       console.error("Login error:", err);
-      alert("❌ Network error. Try again.");
+      alert("❌ " + err.message);
     }
   });
 });
