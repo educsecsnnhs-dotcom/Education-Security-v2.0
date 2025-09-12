@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (user.role !== "Student", "SuperAdmin") {
     alert("Access denied. Students only.");
-    window.location.href = "../welcome.html";
+    window.location.href = "welcome.html";
     return;
   }
 
