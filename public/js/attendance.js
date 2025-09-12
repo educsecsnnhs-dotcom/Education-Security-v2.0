@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "Student", "SuperAdmin") {
-    alert("Access denied. Students only.");
+  // ✅ Only Student or SuperAdmin can access
+  if (!["Student", "SuperAdmin"].includes(user.role)) {
+    alert("❌ Access denied. Students only.");
     window.location.href = "/welcome.html";
     return;
   }
