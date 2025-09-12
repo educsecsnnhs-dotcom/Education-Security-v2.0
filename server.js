@@ -5,10 +5,11 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
-const announcementsRoute = require("./routes/announcement");
+
+// Routes
+const announcementsRoute = require("./routes/announcement"); // ✅ singular filename
 const eventsRoute = require("./routes/events");
 const reportsRoute = require("./routes/reports");
-
 
 dotenv.config();
 
@@ -35,20 +36,17 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/principal", require("./routes/principal"));
 app.use("/api/lifecycle", require("./routes/lifecycle"));
 app.use("/api/profile", require("./routes/profile"));
-app.use("/api/announcements", require("./routes/announcement"));
 app.use("/api/attendance", require("./routes/attendance"));
 app.use("/api/sections", require("./routes/section")); 
-app.use("/api/announcements", require("./routes/announcements"));
-app.use("/api/announcements", announcementsRoute);
+app.use("/api/announcements", announcementsRoute); // ✅ only once
 app.use("/api/events", eventsRoute);
 app.use("/api/reports", reportsRoute);
 
-// ensure uploads dir exists and serve it
-if (!fs.existsSync("uploads")) fs.mkdirSync("uploads", { recursive: true });
+// ensure uploads dir exists
+if (!fs.existsSync("uploads/announcements")) {
+  fs.mkdirSync("uploads/announcements", { recursive: true });
+}
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// register ssg routes (after auth middleware is loaded)
-app.use("/api/ssg", require("./routes/ssg"));
 
 // Serve frontend from "public"
 app.use(express.static(path.join(__dirname, "public")));
@@ -58,18 +56,6 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-
-// Ensure uploads folder exists
-if (!fs.existsSync("uploads/announcements")) {
-  fs.mkdirSync("uploads/announcements", { recursive: true });
-}
-
-// Serve uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Routes
-const announcementRoutes = require("./routes/announcements");
-app.use("/api/announcements", authMiddleware, announcementRoutes);
 
 // Start Server + Seed SuperAdmin
 app.listen(PORT, async () => {
