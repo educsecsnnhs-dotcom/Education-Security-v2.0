@@ -1,13 +1,5 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Registrar & SuperAdmin = full access
-  // ✅ SSG = read-only (no approve/reject)
-  if (!["Registrar", "SuperAdmin", "SSG"].includes(user.role)) {
-    alert("❌ Access denied");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
   }
 
   const enrolleeList = document.getElementById("enrolleeList");
