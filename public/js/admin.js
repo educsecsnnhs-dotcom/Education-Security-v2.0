@@ -2,9 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "Admin") {
+  if (user.role !== "Admin", "SuperAdmin") {
     alert("Access denied. Admins only.");
-    window.location.href = "../welcome.html";
+    window.location.href = "/welcome.html";
     return;
   }
 
