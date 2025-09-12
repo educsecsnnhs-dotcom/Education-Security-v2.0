@@ -5,40 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
   <link rel="stylesheet" href="/styles.css" />
-  <style>
-    /* Keeps password toggle inside input */
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
-
-    .password-wrapper input {
-      width: 100%;
-      padding-right: 40px; /* space for toggle button */
-    }
-
-    .password-wrapper .toggle-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      line-height: 1;
-      padding: 0;
-    }
-  </style>
 </head>
 <body>
   <div class="form-container">
     <h2>Login</h2>
     <form id="loginForm">
-      <label for="username">Username</label>
-      <input type="text" id="username" required />
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
 
       <label for="password">Password</label>
       <div class="password-wrapper">
@@ -53,7 +26,7 @@
   </div>
 
   <!-- ✅ Session-based auth -->
-  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
   <script>
     // Password toggle logic
     document.addEventListener("DOMContentLoaded", () => {
@@ -61,7 +34,8 @@
       const password = document.getElementById("password");
 
       toggle.addEventListener("click", () => {
-        const type = password.getAttribute("type") === "password" ? "text" : "password";
+        const type =
+          password.getAttribute("type") === "password" ? "text" : "password";
         password.setAttribute("type", type);
         toggle.textContent = type === "password" ? "👁️" : "🙈";
       });
