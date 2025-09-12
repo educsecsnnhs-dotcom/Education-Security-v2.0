@@ -1,59 +1,40 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-  if (!["SSG","Registrar"].includes(user.role)) {
-    alert("Access denied: SSG/Registrar only");
-    window.location.href = "../welcome.html";
-    return;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SSG - Elections</title>
+  <link rel="stylesheet" href="../style.css" />
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/ssg_elections.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='../welcome.html'">⬅ Back</button>
+    <h1>📊 Election Monitoring</h1>
+    <button onclick="Auth.logout()" class="logout">Logout</button>
+  </header>
 
-  const scopeEl = document.getElementById("scope");
-  const targetEl = document.getElementById("target");
-  const positionFilter = document.getElementById("positionFilter");
-  const applyBtn = document.getElementById("apply");
-  const resultsDiv = document.getElementById("results");
-  const exportBtn = document.getElementById("exportCsv");
+  <main>
+    <section class="card">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <label>Scope:
+          <select id="scope">
+            <option value="school">School-wide</option>
+            <option value="grade">Grade</option>
+            <option value="section">Section</option>
+          </select>
+        </label>
+        <input id="target" placeholder="Grade or Section (leave empty for school)" />
+        <select id="positionFilter"><option value="">All positions</option></select>
+        <button id="apply">Apply</button>
+        <button id="exportCsv">Export CSV</button>
+      </div>
+    </section>
 
-  // load positions for filter from candidates
-  async function loadPositions() {
-    const cands = await apiFetch("/api/ssg/candidates");
-    const positions = Array.from(new Set(cands.map(c => c.position)));
-    positionFilter.innerHTML = `<option value="">All positions</option>` + positions.map(p => `<option>${p}</option>`).join("");
-  }
-
-  async function loadResults() {
-    resultsDiv.innerHTML = "Loading...";
-    const qs = new URLSearchParams();
-    if (scopeEl.value) qs.set("scope", scopeEl.value);
-    if (targetEl.value) qs.set("target", targetEl.value);
-    if (positionFilter.value) qs.set("position", positionFilter.value);
-    const url = "/api/ssg/results?" + qs.toString();
-    const res = await apiFetch(url);
-    resultsDiv.innerHTML = "";
-    if (!res.results || !res.results.length) { resultsDiv.innerHTML = "<p>No results yet.</p>"; return; }
-
-    res.results.forEach(r => {
-      const el = document.createElement("div");
-      el.className = "result-row";
-      el.innerHTML = `
-        <img src="${r.candidate.photoUrl || '/images/avatar.png'}" style="width:48px;height:48px;border-radius:6px;object-fit:cover;margin-right:10px;">
-        <strong>${r.candidate.name}</strong> — ${r.candidate.position}
-        <div>Votes: ${r.votes}</div>
-      `;
-      resultsDiv.appendChild(el);
-    });
-  }
-
-  applyBtn.addEventListener("click", loadResults);
-  exportBtn.addEventListener("click", async () => {
-    const qs = new URLSearchParams();
-    if (scopeEl.value) qs.set("scope", scopeEl.value);
-    if (targetEl.value) qs.set("target", targetEl.value);
-    if (positionFilter.value) qs.set("position", positionFilter.value);
-    const url = "/api/ssg/results/export?" + qs.toString();
-    window.location.href = url;
-  });
-
-  await loadPositions();
-  await loadResults();
-});
+    <section class="card">
+      <h2>Results</h2>
+      <div id="results">Loading...</div>
+    </section>
+  </main>
+</body>
+</html>
