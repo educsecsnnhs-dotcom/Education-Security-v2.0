@@ -87,7 +87,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// 🔹 Logout (single version kept)
+// 🔹 Logout
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).json({ message: "Logout failed" });
@@ -98,10 +98,10 @@ router.post("/logout", (req, res) => {
 
 // 🔹 Who am I? (session check)
 router.get("/me", (req, res) => {
-  if (!req.session || !req.session.user) {
-    return res.status(401).json({ message: "Not logged in" });
+  if (req.session && req.session.user) {
+    return res.json({ user: req.session.user });
   }
-  res.json({ user: req.session.user });
+  res.status(401).json({ message: "Not logged in" });
 });
 
 /**
@@ -119,7 +119,9 @@ router.post(
     try {
       const { userId, role } = req.body;
       if (!["Registrar", "Admin"].includes(role)) {
-        return res.status(400).json({ message: "Invalid role for SuperAdmin promotion" });
+        return res
+          .status(400)
+          .json({ message: "Invalid role for SuperAdmin promotion" });
       }
 
       const user = await User.findById(userId);
