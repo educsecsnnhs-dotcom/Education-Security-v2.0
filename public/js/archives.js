@@ -1,11 +1,6 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
 
-  // 🔹 Access helper: SuperAdmin always allowed
-  function canAccessArchive(role) {
-    if (role === "SuperAdmin") return true;
-    return role === "Registrar"; // only Registrar otherwise
   }
 
   if (!canAccessArchive(user.role)) {
