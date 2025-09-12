@@ -1,13 +1,6 @@
 // public/js/recordbook.js
-document.addEventListener("DOMContentLoaded", async () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Allow only Moderator and SuperAdmin
-  if (!["Moderator", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. Teachers only.");
-    window.location.href = "/welcome.html";
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  checkAccess(["Moderator"], { redirectTo: "/welcome.html" });
   }
 
   const sectionSelect = document.getElementById("sectionSelect");
