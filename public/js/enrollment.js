@@ -3,6 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
   Auth.requireLogin(); // ensure logged in
   const user = Auth.getUser();
 
+  // ✅ Only Students and SuperAdmin can enroll
+  if (!["Student", "SuperAdmin"].includes(user.role)) {
+    alert("❌ Access denied. Only students can submit enrollment.");
+    window.location.href = "/welcome.html";
+    return;
+  }
+
   const levelSelect = document.getElementById("levelSelect");
   const strandSection = document.getElementById("strandSection");
   const strandSelect = document.getElementById("strandSelect");
@@ -11,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const juniorStrands = ["STE", "Regular", "TechVoc", "Sports", "SPA"];
   const seniorStrands = ["STEM", "CIT", "GAS", "HUMMS", "TVL", "ABM"];
 
-  // Show strand options depending on level
+  // 🔹 Show strand options depending on level
   levelSelect.addEventListener("change", (e) => {
     strandSelect.innerHTML = "";
     if (e.target.value === "junior") {
@@ -29,12 +36,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle submission
+  // 🔹 Handle submission
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new FormData(form);
     formData.append("userId", user._id);
+
+    // ✅ Validate before sending
+    const level = formData.get("level");
+    const strand = formData.get("strand");
+    if (!level) {
+      alert("⚠ Please select a grade level.");
+      return;
+    }
+    if ((level === "junior" || level === "senior") && !strand) {
+      alert("⚠ Please select a strand.");
+      return;
+    }
 
     try {
       const res = await fetch("/api/lifecycle/enroll", {
@@ -59,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("✅ Enrollment submitted successfully! Please wait for registrar approval.");
       window.location.href = "../welcome.html";
     } catch (err) {
-      console.error(err);
+      console.error("Enrollment error:", err);
       alert("❌ Network error. Please check your connection and try again.");
     }
   });
