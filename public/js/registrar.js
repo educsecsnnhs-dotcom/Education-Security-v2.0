@@ -1,13 +1,6 @@
 // public/js/registrar.js
 document.addEventListener("DOMContentLoaded", () => {
-  Auth.requireLogin();
-  const user = Auth.getUser();
-
-  // ✅ Allow only Registrar and SuperAdmin
-  if (!["Registrar", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. Registrar only.");
-    window.location.href = "/welcome.html";
-    return;
+  checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
   }
 
   const enrolledCountEl = document.getElementById("enrolledCount");
