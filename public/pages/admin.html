@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Department Admin Dashboard</title>
+  <link rel="stylesheet" href="../style.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/admin.js"></script>
+</head>
+<body>
+  <header>
+    <button onclick="window.location.href='../welcome.html'">⬅ Back</button>
+    <h1>⚙️ Department Admin Dashboard</h1>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </header>
+
+  <main class="admin-dashboard">
+    <!-- Tab Navigation -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="announcements">📢 Announcements</button>
+      <button class="tab-btn" data-tab="members">👥 Members</button>
+      <button class="tab-btn" data-tab="reports">📊 Reports</button>
+      <button class="tab-btn" data-tab="events">📅 Events</button>
+    </nav>
+
+    <!-- Tab Content -->
+    <section id="announcements" class="tab-content active">
+      <h2>📢 Strand Announcements</h2>
+      <form id="announcementForm">
+        <textarea id="announcementText" placeholder="Write announcement..." required></textarea>
+        <button type="submit">Post</button>
+      </form>
+      <ul id="announcementList"></ul>
+    </section>
+
+    <section id="members" class="tab-content">
+      <h2>👥 Strand Members</h2>
+      <input type="text" id="memberSearch" placeholder="Search by name or section...">
+      <div id="memberList"></div>
+    </section>
+
+    <section id="reports" class="tab-content">
+      <h2>📊 Strand Reports</h2>
+      <div class="report-section">
+        <h3>Grades Summary</h3>
+        <canvas id="gradesChart"></canvas>
+      </div>
+      <div class="report-section">
+        <h3>Attendance Summary</h3>
+        <canvas id="attendanceChart"></canvas>
+      </div>
+    </section>
+
+    <section id="events" class="tab-content">
+      <h2>📅 Strand Events</h2>
+      <form id="eventForm">
+        <input type="text" id="eventTitle" placeholder="Event Title" required>
+        <input type="date" id="eventDate" required>
+        <textarea id="eventDetails" placeholder="Event Details..." required></textarea>
+        <button type="submit">Add Event</button>
+      </form>
+      <ul id="eventList"></ul>
+    </section>
+  </main>
+</body>
+</html>
