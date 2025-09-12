@@ -10,6 +10,9 @@
   <div class="form-container">
     <h2>Register</h2>
     <form id="registerForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" required />
+
       <label for="email">Email</label>
       <input type="email" id="email" required />
 
@@ -25,6 +28,20 @@
     <p>Already have an account? <a href="login.html">Login here</a></p>
   </div>
 
-  <script src="register.js"></script>
+  <!-- ✅ Use centralized session-based auth -->
+  <script src="js/auth.js"></script>
+  <script>
+    // Password toggle logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("togglePassword");
+      const password = document.getElementById("password");
+
+      toggle.addEventListener("click", () => {
+        const type = password.getAttribute("type") === "password" ? "text" : "password";
+        password.setAttribute("type", type);
+        toggle.textContent = type === "password" ? "👁️" : "🙈";
+      });
+    });
+  </script>
 </body>
 </html>
