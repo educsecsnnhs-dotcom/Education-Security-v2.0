@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const recordBody = document.getElementById("recordBody");
   const saveBtn = document.getElementById("saveGrades");
   const finalizeBtn = document.getElementById("finalizeGrades");
-
   const presentBtn = document.getElementById("markPresent");
   const absentBtn = document.getElementById("markAbsent");
   const excusedBtn = document.getElementById("markExcused");
+  const lastUpdated = document.getElementById("lastUpdated");
 
   let currentRecordBook = null;
   let currentSheet = "Sheet1";
@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔹 Load teacher’s assigned sections + subjects
   async function loadSections() {
+    sectionSelect.innerHTML = ""; // reset
     try {
       const assignments = await apiFetch(`/api/sections/teacher/${user._id}`);
       if (!assignments.length) {
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const opt = document.createElement("option");
         opt.value = JSON.stringify({
           sectionId: asg.section._id,
-          subject: asg.subject
+          subject: asg.subject,
         });
         opt.textContent = `${asg.section.name} - ${asg.subject}`;
         sectionSelect.appendChild(opt);
@@ -69,15 +70,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 🔹 Load record book from backend
+  // 🔹 Load record book
   async function loadRecordBook() {
     const selected = sectionSelect.value;
     if (!selected) return alert("Select a section + subject first!");
 
     const { sectionId, subject } = JSON.parse(selected);
 
+    recordBody.innerHTML = `<tr><td colspan="5">Loading record book...</td></tr>`;
+
     try {
-      // Check if record book exists
       const existing = await apiFetch(
         `/api/recordbook/find?sectionId=${sectionId}&subject=${encodeURIComponent(subject)}`
       );
@@ -104,9 +106,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       gradesMatrix = data.grades || [];
       renderTable();
+      updateTimestamp();
     } catch (err) {
       console.error("Error loading record book:", err);
-      alert("⚠️ Failed to load record book.");
+      recordBody.innerHTML = `<tr><td colspan="5">⚠️ Failed to load record book</td></tr>`;
     }
   }
 
@@ -120,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Header
+    // Header row
     const headerRow = document.createElement("tr");
     gradesMatrix[0].forEach(cell => {
       const th = document.createElement("th");
@@ -150,19 +153,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       recordBody.appendChild(tr);
     }
 
-    // Capture edits
-    recordBody.addEventListener("input", e => {
+    // Avoid duplicate listeners
+    recordBody.oninput = e => {
       const td = e.target;
+      if (td.tagName !== "TD") return;
       const row = parseInt(td.dataset.row);
       const col = parseInt(td.dataset.col);
       gradesMatrix[row][col] = td.textContent;
-    });
+    };
   }
 
   // 🔹 Save to Google Sheets
   async function saveGrades() {
     if (!currentRecordBook) return;
     try {
+      saveBtn.disabled = true;
       await apiFetch(`/api/recordbook/input`, {
         method: "POST",
         body: JSON.stringify({
@@ -172,53 +177,68 @@ document.addEventListener("DOMContentLoaded", async () => {
         }),
       });
       alert("✅ Grades saved to Google Sheets");
+      updateTimestamp();
     } catch (err) {
       console.error("Save error:", err);
       alert("⚠️ Failed to save grades.");
+    } finally {
+      saveBtn.disabled = false;
     }
   }
 
   // 🔹 Finalize
   async function finalizeGrades() {
     if (!currentRecordBook) return;
-
     const confirmFinalize = confirm("⚠️ Once finalized, grades cannot be edited. Continue?");
     if (!confirmFinalize) return;
 
     try {
+      finalizeBtn.disabled = true;
       await apiFetch(`/api/recordbook/finalize`, {
         method: "POST",
         body: JSON.stringify({ recordBookId: currentRecordBook._id }),
       });
       alert("✅ Grades finalized");
+      updateTimestamp();
     } catch (err) {
       console.error("Finalize error:", err);
       alert("⚠️ Failed to finalize grades.");
+    } finally {
+      finalizeBtn.disabled = false;
     }
   }
 
-  // 🔹 Mark attendance helper
+  // 🔹 Mark attendance
   async function markAttendance(status) {
     if (!currentRecordBook) return;
 
     try {
-      // Apply attendance in the "Attendance" column (C)
       const studentRows = gradesMatrix.slice(1); // exclude header
+      if (!studentRows.length) return alert("⚠️ No students found.");
+
       const values = studentRows.map(row => [row[0], row[1], status]); // [LRN, Name, Status]
 
       await apiFetch(`/api/recordbook/attendance`, {
         method: "POST",
         body: JSON.stringify({
           recordBookId: currentRecordBook._id,
-          range: currentSheet + "!A2:C" + (studentRows.length + 1),
+          range: `${currentSheet}!A2:C${studentRows.length + 1}`,
           values,
         }),
       });
 
       alert(`✅ Attendance marked: ${status}`);
+      updateTimestamp();
     } catch (err) {
       console.error("Attendance error:", err);
       alert("⚠️ Failed to mark attendance.");
+    }
+  }
+
+  // 🔹 Update timestamp
+  function updateTimestamp() {
+    if (lastUpdated) {
+      lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
     }
   }
 
