@@ -1129,3 +1129,115 @@ td.late {
   border-radius: 6px;
   margin-top: 0.5rem;
 }
+/* 🔹 SSG Management Page */
+#ssgManagement {
+  padding: 20px;
+}
+
+#ssgManagement h2 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+#ssgManagement .tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#ssgManagement .tab-btn {
+  padding: 10px 15px;
+  border: none;
+  background: #f2f2f2;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+#ssgManagement .tab-btn.active {
+  background: #007bff;
+  color: #fff;
+}
+
+#ssgManagement .tab-content {
+  display: none;
+}
+
+#ssgManagement .tab-content.active {
+  display: block;
+}
+
+/* Forms */
+#ssgManagement .form-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+#ssgManagement .form-card input,
+#ssgManagement .form-card select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#ssgManagement .form-card button {
+  padding: 8px 12px;
+  border: none;
+  background: #28a745;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#ssgManagement .form-card button:hover {
+  background: #218838;
+}
+
+/* Tables */
+#ssgManagement .table-container {
+  overflow-x: auto;
+}
+
+#ssgManagement table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#ssgManagement th, #ssgManagement td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+#ssgManagement th {
+  background: #f8f9fa;
+}
+
+#ssgManagement td button {
+  margin-right: 5px;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#ssgManagement td button.edit {
+  background: #ffc107;
+  color: #000;
+}
+
+#ssgManagement td button.delete {
+  background: #dc3545;
+  color: #fff;
+}
