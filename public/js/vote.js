@@ -1,3 +1,4 @@
+// public/js/vote.js
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
@@ -8,102 +9,104 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Student Info
-  document.getElementById("studentName").textContent = user.name || "Unknown";
-  document.getElementById("studentLRN").textContent = user.lrn || "N/A";
-  document.getElementById("studentGrade").textContent = user.grade || "N/A";
-  document.getElementById("studentSection").textContent = user.section?.name || "N/A";
-
-  const votingSection = document.getElementById("votingSection");
-  const votedSection = document.getElementById("votedSection");
-  const submitBtn = document.getElementById("submitVote");
-
-  // 🔹 1. Check if student has already voted
-  try {
-    const alreadyVoted = await apiFetch(`/api/ssg/voted/${user._id}`);
-    if (alreadyVoted?.voted) {
-      votedSection.classList.remove("hidden");
-      return;
-    }
-  } catch (err) {
-    console.error("Vote check failed:", err);
-  }
-
-  // If not voted, show voting form
-  votingSection.classList.remove("hidden");
-
+  // Elements (create your vote.html to contain these ids)
   const ssgForm = document.getElementById("ssgForm");
   const gradeForm = document.getElementById("gradeForm");
   const sectionForm = document.getElementById("sectionForm");
+  const submitBtn = document.getElementById("submitVote");
 
-  // 🔹 2. Fetch candidates
-  let candidates;
-  try {
-    candidates = await apiFetch(`/api/ssg/candidates?grade=${user.grade}&section=${user.section?.name}`);
-  } catch (err) {
-    console.error("Error fetching candidates:", err);
-    alert("⚠️ Failed to load candidates.");
-    return;
+  // Load candidates for scopes:
+  async function loadCandidates() {
+    // School-wide candidates
+    const schoolCands = await apiFetch("/api/ssg/candidates?scope=school");
+    renderCandidates(schoolCands, ssgForm, "school");
+
+    // Grade-level (use user.grade)
+    const gradeCands = await apiFetch(`/api/ssg/candidates?scope=grade&target=${user.grade || ""}`);
+    renderCandidates(gradeCands, gradeForm, "grade");
+
+    // Section-level (use user.section)
+    const sectionCands = await apiFetch(`/api/ssg/candidates?scope=section&target=${encodeURIComponent(user.section || "")}`);
+    renderCandidates(sectionCands, sectionForm, "section");
   }
 
-  // Render candidates with nicer UI
-  function renderCandidates(list, form, groupName, emptyMsg) {
-    if (list && list.length > 0) {
-      list.forEach(c => {
-        const wrapper = document.createElement("label");
-        wrapper.classList.add("candidate-item");
-        wrapper.innerHTML = `
-          <input type="radio" name="${groupName}" value="${c._id}" />
-          <div class="candidate-card">
-            <span class="candidate-name">${c.name}</span>
-            <span class="candidate-position">${c.position}</span>
-          </div>
-        `;
-        form.appendChild(wrapper);
-      });
-    } else {
-      form.innerHTML = `<p class="empty">${emptyMsg}</p>`;
-    }
-  }
-
-  renderCandidates(candidates?.ssg, ssgForm, "ssgVote", "No SSG candidates available.");
-  renderCandidates(candidates?.grade, gradeForm, "gradeVote", "No grade-level candidates available.");
-  renderCandidates(candidates?.section, sectionForm, "sectionVote", "No section-level candidates available.");
-
-  // 🔹 3. Submit vote
-  submitBtn.addEventListener("click", async () => {
-    const selectedSSG = document.querySelector("input[name='ssgVote']:checked")?.value;
-    const selectedGrade = document.querySelector("input[name='gradeVote']:checked")?.value;
-    const selectedSection = document.querySelector("input[name='sectionVote']:checked")?.value;
-
-    if (!selectedSSG || !selectedGrade || !selectedSection) {
-      alert("⚠️ Please select a candidate in all categories.");
+  function renderCandidates(list, container, scope) {
+    container.innerHTML = "";
+    if (!list || !list.length) {
+      container.innerHTML = "<p>No candidates.</p>";
       return;
     }
+    // group by position
+    const byPos = {};
+    list.forEach(c => {
+      byPos[c.position] = byPos[c.position] || [];
+      byPos[c.position].push(c);
+    });
 
-    const payload = {
-      studentId: user._id,
-      ssgVote: selectedSSG,
-      gradeVote: selectedGrade,
-      sectionVote: selectedSection,
-    };
+    Object.keys(byPos).forEach(position => {
+      const h = document.createElement("h4");
+      h.textContent = position;
+      container.appendChild(h);
+
+      byPos[position].forEach(c => {
+        const id = `${scope}_${position}_${c._id}`;
+        const label = document.createElement("label");
+        label.innerHTML = `
+          <input type="radio" name="${scope}_${position}" value="${c._id}" data-position="${position}" data-scope="${scope}" />
+          ${c.name}
+        `;
+        container.appendChild(label);
+        container.appendChild(document.createElement("br"));
+      });
+    });
+  }
+
+  // Check if user already voted
+  async function checkVoted() {
+    const res = await apiFetch(`/api/ssg/voted/${user._id}`);
+    if (res.voted && res.voted.length) {
+      // disable voting if already voted for anything (more advanced: check per position/scope)
+      // We'll disable submit if they have at least one vote matching the current scopes.
+      // For now: warn and let them see selections if they haven't for that position.
+      // Simpler UX: if any vote exists, hide submit.
+      submitBtn.disabled = res.voted.length > 0;
+      if (res.voted.length > 0) {
+        submitBtn.textContent = "You have already voted";
+      }
+    }
+  }
+
+  // Submit votes
+  submitBtn.addEventListener("click", async () => {
+    const votes = [];
+    // gather radio groups by name
+    const inputs = document.querySelectorAll("input[type='radio']:checked");
+    inputs.forEach(inp => {
+      votes.push({
+        position: inp.dataset.position,
+        candidateId: inp.value,
+        scope: inp.dataset.scope,
+        target: inp.dataset.scope === "school" ? null : (inp.dataset.scope === "grade" ? user.grade : user.section)
+      });
+    });
+
+    if (!votes.length) return alert("Select at least one candidate.");
 
     try {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitting...";
-
       await apiFetch("/api/ssg/vote", {
         method: "POST",
-        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ votes })
       });
-
-      alert("✅ Your vote has been submitted successfully!");
-      window.location.href = "../welcome.html";
+      alert("✅ Vote submitted!");
+      await checkVoted();
     } catch (err) {
-      console.error("Vote failed:", err);
+      console.error(err);
       alert("❌ Failed to submit vote.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = "✅ Submit Vote";
     }
   });
+
+  // Init
+  await loadCandidates();
+  await checkVoted();
 });
