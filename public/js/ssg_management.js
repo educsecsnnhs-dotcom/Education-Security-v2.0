@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
-  if (user.role !== "SSG") {
+  if (user.role !== "SSG", "SuperAdmin") {
     alert("Access denied: SSG only");
     window.location.href = "../welcome.html";
     return;
