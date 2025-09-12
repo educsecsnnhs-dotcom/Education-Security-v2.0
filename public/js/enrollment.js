@@ -1,13 +1,6 @@
 // public/js/enrollment.js
 document.addEventListener("DOMContentLoaded", () => {
-  Auth.requireLogin(); // ensure logged in
-  const user = Auth.getUser();
-
-  // ✅ Only Students and SuperAdmin can enroll
-  if (!["Student", "SuperAdmin"].includes(user.role)) {
-    alert("❌ Access denied. Only students can submit enrollment.");
-    window.location.href = "/welcome.html";
-    return;
+  checkAccess(["Student"], { redirectTo: "/welcome.html" });
   }
 
   const levelSelect = document.getElementById("levelSelect");
