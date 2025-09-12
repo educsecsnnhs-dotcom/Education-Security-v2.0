@@ -5,19 +5,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ✅ Correct role check
   if (!["Student", "SuperAdmin"].includes(user.role)) {
-    alert("Access denied. Students only.");
+    alert("❌ Access denied. Students only.");
     window.location.href = "/welcome.html";
     return;
   }
 
-  // Elements (ensure vote.html contains these IDs)
+  // Elements (make sure vote.html contains these IDs)
   const ssgForm = document.getElementById("ssgForm");
   const gradeForm = document.getElementById("gradeForm");
   const sectionForm = document.getElementById("sectionForm");
   const submitBtn = document.getElementById("submitVote");
+  const lastUpdated = document.getElementById("lastUpdated");
 
   /* ---------------- Load Candidates ---------------- */
   async function loadCandidates() {
+    ssgForm.innerHTML = gradeForm.innerHTML = sectionForm.innerHTML = "<p>Loading candidates...</p>";
     try {
       // School-wide candidates
       const schoolCands = await apiFetch("/api/ssg/candidates?scope=school");
@@ -30,6 +32,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Section-level
       const sectionCands = await apiFetch(`/api/ssg/candidates?scope=section&target=${encodeURIComponent(user.section || "")}`);
       renderCandidates(sectionCands, sectionForm, "section");
+
+      updateTimestamp();
     } catch (err) {
       console.error("❌ Failed to load candidates:", err);
       ssgForm.innerHTML = gradeForm.innerHTML = sectionForm.innerHTML = "<p>⚠️ Error loading candidates.</p>";
@@ -44,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // group by position
+    // Group by position
     const byPos = {};
     list.forEach(c => {
       byPos[c.position] = byPos[c.position] || [];
@@ -110,18 +114,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
       await apiFetch("/api/ssg/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ votes })
       });
+
       alert("✅ Vote submitted!");
       await checkVoted();
     } catch (err) {
       console.error("❌ Failed to submit vote:", err);
       alert("❌ Failed to submit vote.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Vote";
     }
   });
+
+  /* ---------------- Helpers ---------------- */
+  function updateTimestamp() {
+    if (lastUpdated) {
+      lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+    }
+  }
 
   /* ---------------- Init ---------------- */
   await loadCandidates();
