@@ -3,31 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>SSG Management</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="js/auth.js"></script>
-  <script defer src="js/script.js"></script>
-  <script defer src="js/ssg.js"></script>
+  <link rel="stylesheet" href="../style.css">
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/ssg.js"></script>
 </head>
 <body>
   <header>
-    <button onclick="window.location.href='welcome.html'">⬅ Back</button>
-    <h1>🎓 SSG Management</h1>
+    <button onclick="window.location.href='../welcome.html'">⬅ Back</button>
+    <h1>🏛️ SSG Management</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
-  <main>
-    <!-- Create Post (SSG only) -->
-    <section id="createSection" style="display: none;">
-      <h2>📝 Create New Post</h2>
-      <input type="text" id="postTitle" placeholder="Title">
-      <textarea id="postContent" placeholder="Write your announcement or event..."></textarea>
-      <button id="createPostBtn">Post</button>
+  <main id="ssgManagement">
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="candidates">👥 Candidates</button>
+      <button class="tab-btn" data-tab="elections">🗳️ Elections</button>
+      <button class="tab-btn" data-tab="officers">🎓 Officers</button>
+    </nav>
+
+    <!-- Tab Content -->
+    <section id="candidates" class="tab-content active">
+      <h2>Candidate Management</h2>
+      <form id="candidateForm" class="form-card">
+        <input type="text" id="candName" placeholder="Candidate Name" required>
+        <input type="text" id="candPosition" placeholder="Position" required>
+        <select id="candLevel" required>
+          <option value="">Select Level</option>
+          <option value="school">School-wide</option>
+          <option value="grade">Grade-level</option>
+          <option value="section">Section</option>
+        </select>
+        <button type="submit">➕ Add Candidate</button>
+      </form>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Level</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="candidatesTable">
+            <tr><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- Posts -->
-    <section>
-      <h2>📢 SSG Announcements & Events</h2>
-      <div id="postsList"></div>
+    <section id="elections" class="tab-content">
+      <h2>Election Monitoring</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate</th>
+              <th>Position</th>
+              <th>Votes</th>
+            </tr>
+          </thead>
+          <tbody id="electionsTable">
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="officers" class="tab-content">
+      <h2>SSG Officers</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Department/Strand</th>
+            </tr>
+          </thead>
+          <tbody id="officersTable">
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
 </body>
