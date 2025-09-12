@@ -3,8 +3,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   Auth.requireLogin();
   const user = Auth.getUser();
 
-  if (user.role !== "Moderator", "SuperAdmin") {
-    alert("Access denied. Teachers only.");
+  // ✅ Allow only Moderator and SuperAdmin
+  if (!["Moderator", "SuperAdmin"].includes(user.role)) {
+    alert("❌ Access denied. Teachers only.");
     window.location.href = "/welcome.html";
     return;
   }
@@ -30,25 +31,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔹 Load teacher’s assigned sections + subjects
   async function loadSections() {
-    const assignments = await apiFetch(`/api/sections/teacher/${user._id}`);
-    assignments.forEach(asg => {
-      const opt = document.createElement("option");
-      opt.value = JSON.stringify({ sectionId: asg.section._id, subject: asg.subject });
-      opt.textContent = `${asg.section.name} - ${asg.subject}`;
-      sectionSelect.appendChild(opt);
-    });
+    try {
+      const assignments = await apiFetch(`/api/sections/teacher/${user._id}`);
+      if (!assignments.length) {
+        sectionSelect.innerHTML = `<option disabled>No sections assigned</option>`;
+        return;
+      }
+      assignments.forEach(asg => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify({
+          sectionId: asg.section._id,
+          subject: asg.subject
+        });
+        opt.textContent = `${asg.section.name} - ${asg.subject}`;
+        sectionSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Error loading sections:", err);
+      alert("⚠️ Failed to load sections.");
+    }
   }
 
   // 🔹 Load available sheet tabs
   async function loadSheets(sheetId) {
     sheetSelect.innerHTML = "";
-    const sheets = await apiFetch(`/api/recordbook/sheets/${sheetId}`);
-    sheets.forEach(s => {
-      const opt = document.createElement("option");
-      opt.value = s;
-      opt.textContent = s;
-      sheetSelect.appendChild(opt);
-    });
+    try {
+      const sheets = await apiFetch(`/api/recordbook/sheets/${sheetId}`);
+      sheets.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s;
+        sheetSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Error loading sheets:", err);
+      alert("⚠️ Could not load sheet tabs.");
+    }
   }
 
   // 🔹 Load record book from backend
@@ -58,30 +76,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { sectionId, subject } = JSON.parse(selected);
 
-    // Check if record book exists
-    const existing = await apiFetch(`/api/recordbook/find?sectionId=${sectionId}&subject=${encodeURIComponent(subject)}`);
-    if (!existing) {
-      // Auto-create if none exists
-      const created = await apiFetch(`/api/recordbook/create`, {
-        method: "POST",
-        body: JSON.stringify({ sectionId, subject, teacherId: user._id }),
-      });
-      currentRecordBook = created.recordBook;
-    } else {
-      currentRecordBook = existing;
+    try {
+      // Check if record book exists
+      const existing = await apiFetch(
+        `/api/recordbook/find?sectionId=${sectionId}&subject=${encodeURIComponent(subject)}`
+      );
+
+      if (!existing) {
+        // Auto-create if none exists
+        const created = await apiFetch(`/api/recordbook/create`, {
+          method: "POST",
+          body: JSON.stringify({ sectionId, subject, teacherId: user._id }),
+        });
+        currentRecordBook = created.recordBook;
+      } else {
+        currentRecordBook = existing;
+      }
+
+      await loadSheets(currentRecordBook.sheetId);
+
+      currentSheet = sheetSelect.value || "Sheet1";
+      currentRange = rangeInput.value || "A1:Z50";
+
+      const data = await apiFetch(
+        `/api/recordbook/grades?recordBookId=${currentRecordBook._id}&range=${encodeURIComponent(currentSheet + "!" + currentRange)}`
+      );
+
+      gradesMatrix = data.grades || [];
+      renderTable();
+    } catch (err) {
+      console.error("Error loading record book:", err);
+      alert("⚠️ Failed to load record book.");
     }
-
-    await loadSheets(currentRecordBook.sheetId);
-
-    currentSheet = sheetSelect.value || "Sheet1";
-    currentRange = rangeInput.value || "A1:Z50";
-
-    const data = await apiFetch(
-      `/api/recordbook/grades?recordBookId=${currentRecordBook._id}&range=${encodeURIComponent(currentSheet + "!" + currentRange)}`
-    );
-
-    gradesMatrix = data.grades || [];
-    renderTable();
   }
 
   // 🔹 Render table
@@ -136,17 +162,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 🔹 Save to Google Sheets
   async function saveGrades() {
     if (!currentRecordBook) return;
-
-    await apiFetch(`/api/recordbook/input`, {
-      method: "POST",
-      body: JSON.stringify({
-        recordBookId: currentRecordBook._id,
-        range: currentSheet + "!" + currentRange,
-        values: gradesMatrix,
-      }),
-    });
-
-    alert("Grades saved to Google Sheets ✅");
+    try {
+      await apiFetch(`/api/recordbook/input`, {
+        method: "POST",
+        body: JSON.stringify({
+          recordBookId: currentRecordBook._id,
+          range: currentSheet + "!" + currentRange,
+          values: gradesMatrix,
+        }),
+      });
+      alert("✅ Grades saved to Google Sheets");
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("⚠️ Failed to save grades.");
+    }
   }
 
   // 🔹 Finalize
@@ -156,32 +185,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     const confirmFinalize = confirm("⚠️ Once finalized, grades cannot be edited. Continue?");
     if (!confirmFinalize) return;
 
-    await apiFetch(`/api/recordbook/finalize`, {
-      method: "POST",
-      body: JSON.stringify({ recordBookId: currentRecordBook._id }),
-    });
-
-    alert("Grades finalized ✅");
+    try {
+      await apiFetch(`/api/recordbook/finalize`, {
+        method: "POST",
+        body: JSON.stringify({ recordBookId: currentRecordBook._id }),
+      });
+      alert("✅ Grades finalized");
+    } catch (err) {
+      console.error("Finalize error:", err);
+      alert("⚠️ Failed to finalize grades.");
+    }
   }
 
   // 🔹 Mark attendance helper
   async function markAttendance(status) {
     if (!currentRecordBook) return;
 
-    // Apply attendance in the "Attendance" column (C)
-    const studentRows = gradesMatrix.slice(1); // exclude header
-    const values = studentRows.map(row => [row[0], row[1], status]); // [LRN, Name, Status]
+    try {
+      // Apply attendance in the "Attendance" column (C)
+      const studentRows = gradesMatrix.slice(1); // exclude header
+      const values = studentRows.map(row => [row[0], row[1], status]); // [LRN, Name, Status]
 
-    await apiFetch(`/api/recordbook/attendance`, {
-      method: "POST",
-      body: JSON.stringify({
-        recordBookId: currentRecordBook._id,
-        range: currentSheet + "!A2:C" + (studentRows.length + 1),
-        values,
-      }),
-    });
+      await apiFetch(`/api/recordbook/attendance`, {
+        method: "POST",
+        body: JSON.stringify({
+          recordBookId: currentRecordBook._id,
+          range: currentSheet + "!A2:C" + (studentRows.length + 1),
+          values,
+        }),
+      });
 
-    alert(`Attendance marked: ${status} ✅`);
+      alert(`✅ Attendance marked: ${status}`);
+    } catch (err) {
+      console.error("Attendance error:", err);
+      alert("⚠️ Failed to mark attendance.");
+    }
   }
 
   // 🔹 Event bindings
