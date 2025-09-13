@@ -1,3 +1,5 @@
+//seedAdmin.js
+
 const User = require("./models/User");
 const { encryptPassword } = require("./utils/caesar");
 
