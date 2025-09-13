@@ -8,28 +8,26 @@ const fs = require("fs");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
-// Routes
-const announcementsRoute = require("./routes/announcement");
-const eventsRoute = require("./routes/events");
-
 dotenv.config();
 
 const app = express();
 
-// ✅ CORS (frontend + backend same Render domain)
+/* ---------------------- 🔐 Security & Middleware ---------------------- */
+
+// CORS: allow frontend + backend on same Render domain
 app.use(
   cors({
-    origin: ["https://education-security-v2-0.onrender.com"], // your deployed frontend
-    credentials: true, // ✅ allow cookies
+    origin: process.env.CLIENT_URL || "https://education-security-v2-0.onrender.com",
+    credentials: true,
   })
 );
 
-// Middleware
 app.use(express.json());
 app.use(morgan("dev"));
 
-// ✅ Sessions
-app.set("trust proxy", 1); // ✅ trust Render's proxy so secure cookies work
+// ✅ Trust Render proxy for secure cookies
+app.set("trust proxy", 1);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "supersecretkey",
@@ -41,21 +39,21 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: true, // ✅ only send cookie over HTTPS
-      sameSite: "none", // ✅ required for cross-origin cookies
+      secure: process.env.NODE_ENV === "production", // ✅ only secure in production
+      sameSite: "none",
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
 );
 
-// MongoDB connection
+/* ---------------------- 🔗 Database ---------------------- */
 const connectDB = require("./config/db");
 connectDB();
 
-// ✅ Import Seeder
+/* ---------------------- 🌱 Seeder ---------------------- */
 const seedAdmin = require("./seedAdmin");
 
-// API Routes
+/* ---------------------- 📦 API Routes ---------------------- */
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/registrar", require("./routes/registrar"));
 app.use("/api/recordbook", require("./routes/recordbook"));
@@ -64,8 +62,10 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/principal", require("./routes/principal"));
 app.use("/api/profile", require("./routes/profile"));
 app.use("/api/attendance", require("./routes/attendance"));
-app.use("/api/announcements", announcementsRoute);
-app.use("/api/events", eventsRoute);
+app.use("/api/announcements", require("./routes/announcement"));
+app.use("/api/events", require("./routes/events"));
+
+/* ---------------------- 📂 Static Files ---------------------- */
 
 // Ensure uploads dir exists
 if (!fs.existsSync("uploads/announcements")) {
@@ -73,17 +73,18 @@ if (!fs.existsSync("uploads/announcements")) {
 }
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Serve frontend from "public"
+// ✅ Serve frontend (public folder)
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", (req, res) => {
+// ✅ Fallback for SPA/HTML navigation
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+/* ---------------------- 🚀 Start Server ---------------------- */
 const PORT = process.env.PORT || 5000;
 
-// Start Server + Seed SuperAdmin
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  await seedAdmin(); // ✅ Create SuperAdmin if missing
+  await seedAdmin(); // create SuperAdmin if missing
 });
