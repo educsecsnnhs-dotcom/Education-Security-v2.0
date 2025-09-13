@@ -2,48 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Registrar - Pending Enrollees</title>
-  <link rel="stylesheet" href="/styles.css">
-  <script defer src="../js/auth.js"></script>
-  <script defer src="../js/enrollee.js"></script>
+  <title>Registrar Dashboard</title>
+  <!-- Registrar-only CSS -->
+  <link rel="stylesheet" href="/css/registrar.css">
+  
+  <!-- Scripts -->
+  <script defer src="/js/auth.js"></script>
+  <script defer src="/js/registrar.js"></script>
 </head>
 <body>
-  <header>
-    <button onclick="window.location.href='../welcome.html'" class="back-btn">⬅ Back</button>
-    <h1>Registrar Dashboard</h1>
+  <!-- 🔹 Header -->
+  <header class="header">
+    <button onclick="window.location.href='/welcome.html'" class="back-btn">⬅ Back</button>
+    <h1 class="page-title">Registrar Dashboard</h1>
     <button id="logoutBtn" class="logout">Logout</button>
   </header>
 
-  <main>
-    <!-- 🔍 Filters -->
-    <section class="card">
-      <h2>🔍 Search & Filters</h2>
-      <div class="filters">
-        <input type="text" id="searchName" placeholder="Search by name...">
-        <select id="filterLevel">
-          <option value="">All Levels</option>
-          <option value="junior">Junior High</option>
-          <option value="senior">Senior High</option>
-        </select>
-        <input type="text" id="filterStrand" placeholder="Filter by strand (e.g. STEM)">
-        <button id="applyFilters">Apply</button>
-      </div>
-    </section>
-
-    <!-- 📊 Quick Stats -->
+  <!-- 🔹 Main Content -->
+  <main class="container">
+    <!-- 📊 Enrollment Stats -->
     <section class="card">
       <h2>📊 Enrollment Stats</h2>
-      <div id="statsBox">
-        <p><b>Total Pending:</b> <span id="statTotal">0</span></p>
-        <p><b>Junior High:</b> <span id="statJunior">0</span></p>
-        <p><b>Senior High:</b> <span id="statSenior">0</span></p>
+      <div id="statsBox" class="stats-grid">
+        <p><b>Total Officially Enrolled:</b> <span id="enrolledCount">0</span></p>
+        <p><b>Pending Applications:</b> <span id="pendingCount">0</span></p>
       </div>
     </section>
 
-    <!-- 📝 Enrollment Requests -->
+    <!-- 📝 Pending Enrollees -->
     <section class="card">
-      <h2>📋 Enrollment Requests</h2>
-      <div id="enrolleeList" class="enrollee-container"></div>
+      <h2>📝 Pending Enrollees</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>LRN</th>
+            <th>Level</th>
+            <th>Strand</th>
+            <th>School Year</th>
+            <th>Assign Section</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pendingTable"></tbody>
+      </table>
+    </section>
+
+    <!-- ⚙️ Section & Strand Management -->
+    <section class="card">
+      <h2>⚙️ Section & Strand Management</h2>
+      <form id="sectionForm" class="form-grid">
+        <label>
+          Level:
+          <select name="level" required>
+            <option value="junior">Junior High</option>
+            <option value="senior">Senior High</option>
+          </select>
+        </label>
+        <label>
+          Strand:
+          <input type="text" name="strand" placeholder="e.g. STEM, GAS, SPA">
+        </label>
+        <label>
+          Section Name:
+          <input type="text" name="section" placeholder="e.g. A, B, C" required>
+        </label>
+        <label>
+          Student Limit:
+          <input type="number" name="limit" value="40" required>
+        </label>
+        <button type="submit" class="btn-primary">Add / Update Section</button>
+      </form>
+
+      <h3>Existing Sections</h3>
+      <ul id="sectionList"></ul>
     </section>
   </main>
 </body>
