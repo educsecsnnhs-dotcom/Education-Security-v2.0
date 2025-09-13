@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       alert("✅ Enrollment submitted successfully! Please wait for registrar approval.");
-      window.location.href = "../welcome.html";
+      window.location.href = "/welcome.html";
     } catch (err) {
       console.error("Enrollment error:", err);
       alert("❌ Network error. Please check your connection and try again.");
