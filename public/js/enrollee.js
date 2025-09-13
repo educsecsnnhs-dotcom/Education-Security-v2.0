@@ -1,7 +1,10 @@
+// public/js/enrollee.js
 document.addEventListener("DOMContentLoaded", () => {
   checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
-  }
+  
+  const user = Auth.getUser();
 
+  // DOM Elements
   const enrolleeList = document.getElementById("enrolleeList");
   const searchName = document.getElementById("searchName");
   const filterLevel = document.getElementById("filterLevel");
@@ -14,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allEnrollees = [];
 
+  // 🔹 Load pending enrollees from backend
   async function loadEnrollees() {
     try {
       const enrollees = await apiFetch("/api/enrollment/pending");
@@ -26,12 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // 🔹 Update stats summary
   function updateStats(list) {
     statTotal.textContent = list.length;
     statJunior.textContent = list.filter((e) => e.level === "junior").length;
     statSenior.textContent = list.filter((e) => e.level === "senior").length;
   }
 
+  // 🔹 Render enrollee cards
   function renderEnrollees(list) {
     enrolleeList.innerHTML = "";
 
@@ -108,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Filter logic
+  // 🔹 Apply filters
   function applyFilters() {
     const search = searchName.value.toLowerCase();
     const level = filterLevel.value;
@@ -128,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   applyFiltersBtn.addEventListener("click", applyFilters);
 
-  // Approve/Reject (only if role allows)
+  // 🔹 Approve/Reject enrollee (only if role allows)
   enrolleeList.addEventListener("click", async (e) => {
     if (["Registrar", "SuperAdmin"].includes(user.role)) {
       if (e.target.classList.contains("approve-btn")) {
@@ -148,6 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Initial load
+  // 🔹 Initial load
   loadEnrollees();
 });
