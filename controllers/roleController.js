@@ -1,3 +1,5 @@
+//controllers/roleController.js
+
 const User = require("../models/User");
 
 // Helper to add to role history
