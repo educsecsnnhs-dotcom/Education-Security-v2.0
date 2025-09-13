@@ -1,3 +1,5 @@
+//controllers/registrarController.js
+
 const Enrollee = require("../models/Enrollee");
 const Section = require("../models/Section");
 const User = require("../models/User");
