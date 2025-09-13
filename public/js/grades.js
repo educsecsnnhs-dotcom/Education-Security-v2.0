@@ -1,3 +1,5 @@
+//public/js/grades.js
+
 document.addEventListener("DOMContentLoaded", () => {
   checkAccess(["Student"], { redirectTo: "/welcome.html" });
   }
