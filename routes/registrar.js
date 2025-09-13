@@ -13,10 +13,20 @@ const { authRequired, requireRole } = require("../middleware/authMiddleware");
 
 // Registrar only
 router.post("/enrollment", authRequired, requireRole("Registrar"), submitEnrollment);
-router.get("/review", authRequired, requireRole("Registrar"), getPendingEnrollees);
-router.post("/approve", authRequired, requireRole("Registrar"), approveEnrollee);
-router.post("/reject", authRequired, requireRole("Registrar"), rejectEnrollee);
-router.post("/create-section", authRequired, requireRole("Registrar"), createSection);
-router.get("/stats", authRequired, requireRole("Registrar"), getEnrollmentStats);
+
+// 🔹 Match frontend call: GET /api/enrollment/pending
+router.get("/enrollment/pending", authRequired, requireRole("Registrar"), getPendingEnrollees);
+
+// 🔹 Match frontend call: POST /api/enrollment/:id/approve
+router.post("/enrollment/:id/approve", authRequired, requireRole("Registrar"), approveEnrollee);
+
+// 🔹 Match frontend call: POST /api/enrollment/:id/reject
+router.post("/enrollment/:id/reject", authRequired, requireRole("Registrar"), rejectEnrollee);
+
+// Create a new section
+router.post("/sections", authRequired, requireRole("Registrar"), createSection);
+
+// Enrollment stats
+router.get("/registrar/stats", authRequired, requireRole("Registrar"), getEnrollmentStats);
 
 module.exports = router;
