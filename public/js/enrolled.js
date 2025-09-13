@@ -1,3 +1,5 @@
+//public/js/enrolled.js
+
 document.addEventListener("DOMContentLoaded", () => {
   checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
   }
