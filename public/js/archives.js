@@ -1,3 +1,5 @@
+//public/js/archives.js
+
 document.addEventListener("DOMContentLoaded", () => {
   checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
 
