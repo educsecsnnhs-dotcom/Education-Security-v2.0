@@ -1,3 +1,5 @@
+//public/js/attendance.js
+
 document.addEventListener("DOMContentLoaded", () => {
   checkAccess(["Moderator", "Registrar"], { redirectTo: "/welcome.html" });
 }
