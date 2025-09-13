@@ -1,3 +1,5 @@
+//middleware/authMiddleware.js
+
 /**
  * Role Normalization Map
  */
