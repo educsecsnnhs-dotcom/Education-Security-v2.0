@@ -1,7 +1,6 @@
 // public/js/registrar.js
 document.addEventListener("DOMContentLoaded", () => {
   checkAccess(["Registrar"], { redirectTo: "/welcome.html" });
-  }
 
   const enrolledCountEl = document.getElementById("enrolledCount");
   const pendingCountEl = document.getElementById("pendingCount");
@@ -9,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sectionList = document.getElementById("sectionList");
   const sectionForm = document.getElementById("sectionForm");
 
-  // 🔹 Load dashboard data
+  // 🔹 Load dashboard stats
   async function loadStats() {
     try {
       const stats = await apiFetch("/api/registrar/stats");
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadPending() {
     pendingTable.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
     try {
-      const enrollees = await apiFetch("/api/registrar/pending");
+      const enrollees = await apiFetch("/api/registrar/enrollment/pending");
       pendingTable.innerHTML = "";
 
       if (!enrollees.length) {
@@ -37,9 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
       enrollees.forEach(enrollee => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${enrollee.name}</td>
+          <td>${enrollee.fullName}</td>
           <td>${enrollee.lrn}</td>
-          <td>${enrollee.level}</td>
+          <td>${enrollee.gradeLevel}</td>
           <td>${enrollee.strand || "-"}</td>
           <td>${enrollee.schoolYear}</td>
           <td>
@@ -53,14 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
         pendingTable.appendChild(tr);
       });
 
-      // Approve
+      // Approve buttons
       document.querySelectorAll(".approveBtn").forEach(btn => {
         btn.addEventListener("click", async (e) => {
           const id = e.target.dataset.id;
           const section = document.getElementById(`section-${id}`).value.trim();
           if (!section) return alert("⚠️ Please assign a section first.");
           try {
-            await apiFetch(`/api/registrar/approve/${id}`, {
+            await apiFetch(`/api/registrar/enrollment/${id}/approve`, {
               method: "POST",
               body: JSON.stringify({ section }),
             });
@@ -74,13 +73,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
 
-      // Reject
+      // Reject buttons
       document.querySelectorAll(".rejectBtn").forEach(btn => {
         btn.addEventListener("click", async (e) => {
           const id = e.target.dataset.id;
           if (!confirm("❌ Reject this enrollee?")) return;
           try {
-            await apiFetch(`/api/registrar/reject/${id}`, { method: "POST" });
+            await apiFetch(`/api/registrar/enrollment/${id}/reject`, {
+              method: "POST",
+            });
             alert("✅ Enrollee rejected");
             await loadStats();
             await loadPending();
@@ -96,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 🔹 Load sections list
+  // 🔹 Load sections
   async function loadSections() {
     sectionList.innerHTML = `<li>Loading...</li>`;
     try {
@@ -110,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       sections.forEach(sec => {
         const li = document.createElement("li");
-        li.textContent = `${sec.level.toUpperCase()} - ${sec.strand} - Section ${sec.section} (Limit: ${sec.limit})`;
+        li.textContent = `${sec.gradeLevel.toUpperCase()} - ${sec.strand} - ${sec.name} (Limit: ${sec.capacity})`;
         sectionList.appendChild(li);
       });
     } catch (err) {
