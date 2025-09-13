@@ -8,29 +8,25 @@ const {
   rejectEnrollee,
   createSection,
   getEnrollmentStats,
-  getSections,
 } = require("../controllers/registrarController");
 const { authRequired, requireRole } = require("../middleware/authMiddleware");
 
-// Registrar only
+// ✅ Student submits enrollment
 router.post("/enrollment", authRequired, requireRole("Registrar"), submitEnrollment);
 
-// Pending enrollees
-router.get("/enrollment/pending", authRequired, requireRole("Registrar"), getPendingEnrollees);
+// ✅ Pending enrollees list
+router.get("/pending", authRequired, requireRole("Registrar"), getPendingEnrollees);
 
-// Approve enrollee
-router.post("/enrollment/:id/approve", authRequired, requireRole("Registrar"), approveEnrollee);
+// ✅ Approve enrollee (/:id)
+router.post("/approve/:id", authRequired, requireRole("Registrar"), approveEnrollee);
 
-// Reject enrollee
-router.post("/enrollment/:id/reject", authRequired, requireRole("Registrar"), rejectEnrollee);
+// ✅ Reject enrollee (/:id)
+router.post("/reject/:id", authRequired, requireRole("Registrar"), rejectEnrollee);
 
-// Create section
+// ✅ Create section
 router.post("/sections", authRequired, requireRole("Registrar"), createSection);
 
-// Get all sections
-router.get("/sections", authRequired, requireRole("Registrar"), getSections);
-
-// Stats
+// ✅ Enrollment stats
 router.get("/stats", authRequired, requireRole("Registrar"), getEnrollmentStats);
 
 module.exports = router;
